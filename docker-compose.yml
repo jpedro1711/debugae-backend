@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+  gestaodefeitos.webapi:
+    image: ${DOCKER_REGISTRY-}gestaodefeitoswebapi
+    build:
+      context: .
+      dockerfile: GestaoDefeitos.WebApi/Dockerfile
+    depends_on:
+      - sqlserver
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=GestaoDefeitosDb;User=sa;Password=Your_password123;TrustServerCertificate=True
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Your_password123
+    ports:
+      - "1433:1433"
+    restart: always
