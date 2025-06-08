@@ -19,10 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\GestaoDefeitos.Application\GestaoDefeitos.Application.csproj" />
     <ProjectReference Include="..\GestaoDefeitos.Core\GestaoDefeitos.Domain.csproj" />
     <ProjectReference Include="..\GestaoDefeitos.Infrastructure\GestaoDefeitos.Infrastructure.csproj" />
   </ItemGroup>
