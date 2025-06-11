@@ -1,4 +1,4 @@
-﻿using GestaoDefeitos.Domain.Entities.Contributor;
+﻿using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Infrastructure.Database;
 using GestaoDefeitos.WebApi.Extensions.Endpoints;
 using GestaoDefeitos.WebApi.Extensions.Migrations;

@@ -1,5 +1,5 @@
 ﻿using GestaoDefeitos.Application.Requests;
-using GestaoDefeitos.Domain.Entities.Contributor;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Infrastructure.Database;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
@@ -15,7 +15,7 @@ namespace GestaoDefeitos.WebApi.Extensions.Endpoints
 
             group.MapGet("/me", async (ClaimsPrincipal claims, AppDbContext context) =>
             {
-                string userId = claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+                var userId = Guid.Parse(claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
                 return await context.Users.FindAsync(userId);
             })
             .RequireAuthorization();

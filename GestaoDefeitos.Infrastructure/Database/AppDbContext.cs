@@ -1,20 +1,41 @@
-﻿using GestaoDefeitos.Domain.Entities.Contributor;
+﻿using GestaoDefeitos.Domain.AspNetIdentity;
+using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.Entities.RelationEntities;
+using GestaoDefeitos.Infrastructure.Database.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace GestaoDefeitos.Infrastructure.Database
 {
-    public class AppDbContext : IdentityDbContext<Contributor>
+    public class AppDbContext : IdentityDbContext<
+        Contributor,
+        ApplicationRole,
+        Guid,
+        ApplicationUserClaim,
+        ApplicationUserRole,
+        ApplicationUserLogin,
+        ApplicationRoleClaim,
+        ApplicationUserToken>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+        {
+        }
 
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<Defect> Defects { get; set; }
+        public DbSet<ProjectContributor> ProjectContributors { get; set; }
+        public DbSet<ContributorNotification> ContributorNotifications { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<DefectHistory> DefectHistory { get; set; }
+        public DbSet<DefectComment> DefectComments { get; set; }
+        public DbSet<DefectAttachment> DefectAttachments { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Contributor>()
-                .Property(c => c.FullName)
-                .HasMaxLength(100);
+            builder.ApplyConfiguration(new ContributorConfiguration());
+            builder.ApplyConfiguration(new ProjectContributorConfiguration());
         }
     }
 }
