@@ -4,7 +4,7 @@ using GestaoDefeitos.Infrastructure.Database;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
-namespace GestaoDefeitos.WebApi.Extensions.Endpoints
+namespace GestaoDefeitos.WebApi.Endpoints
 {
     public static class ContributorEndpoints
     {

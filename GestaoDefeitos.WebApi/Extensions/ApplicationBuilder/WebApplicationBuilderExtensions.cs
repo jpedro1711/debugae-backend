@@ -1,6 +1,6 @@
 ﻿using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Infrastructure.Database;
-using GestaoDefeitos.WebApi.Extensions.Endpoints;
+using GestaoDefeitos.WebApi.Endpoints;
 using GestaoDefeitos.WebApi.Extensions.Migrations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
