@@ -13,6 +13,14 @@ namespace GestaoDefeitos.WebApi.Endpoints
             var group = endpoints.MapGroup("/contributors")
                 .WithTags("Contributors");
 
+            group.MapGetContributorEndpoint();
+            group.MapCreateContributorEndpoint();
+
+            return endpoints;
+        }
+
+        public static RouteGroupBuilder MapGetContributorEndpoint(this RouteGroupBuilder group)
+        {
             group.MapGet("/me", async (ClaimsPrincipal claims, AppDbContext context) =>
             {
                 var userId = Guid.Parse(claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
@@ -20,6 +28,11 @@ namespace GestaoDefeitos.WebApi.Endpoints
             })
             .RequireAuthorization();
 
+            return group;
+        }
+
+        public static RouteGroupBuilder MapCreateContributorEndpoint(this RouteGroupBuilder group)
+        {
             group.MapPost("/register", async (
                 UserManager<Contributor> userManager,
                 RegisterContributorRequest request) =>
@@ -39,7 +52,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return Results.Created($"/users/{user.Id}", new { user.Id, user.UserName, user.Email, user.FullName });
             });
 
-            return endpoints;
+            return group;
         }
     }
 }
