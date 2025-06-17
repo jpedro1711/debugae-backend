@@ -4,6 +4,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder
     .AddBaseServices()
+    .ConfigureDI()
     .ConfigureIdentity()
     .ConfigureDatabase();
 

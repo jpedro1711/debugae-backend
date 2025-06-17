@@ -1,5 +1,7 @@
 ﻿using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Infrastructure.Database;
+using GestaoDefeitos.Infrastructure.Repositories;
 using GestaoDefeitos.WebApi.Endpoints;
 using GestaoDefeitos.WebApi.Extensions.Migrations;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +18,28 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddAuthorization();
+
+            return builder;
+        }
+
+        public static WebApplicationBuilder ConfigureDI(this WebApplicationBuilder builder)
+        {
+            builder.ConfigureRepositories();
+
+            return builder;
+        }
+
+        public static WebApplicationBuilder ConfigureRepositories(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IDefectRepository, DefectRepository>();
+            builder.Services.AddScoped<IContributorRepository, ContributorRepository>();
+            builder.Services.AddScoped<IContributorNotificationRepository, ContributorNotificationRepository>();
+            builder.Services.AddScoped<IDefectAttachmentRepository, DefectAttachmentRepository>();
+            builder.Services.AddScoped<IDefectCommentRepository, DefectCommentRepository>();
+            builder.Services.AddScoped<IDefectHistoryRepository, DefectHistoryRepository>();
+            builder.Services.AddScoped<IProjectContributorRepository, ProjectContributorRepository>();
+            builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+            builder.Services.AddScoped<ITagRepository, TagRepository>();
 
             return builder;
         }
