@@ -5,6 +5,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder
     .AddBaseServices()
     .ConfigureDI()
+    .ConfigureMediator()
     .ConfigureIdentity()
     .ConfigureDatabase();
 
@@ -15,4 +16,4 @@ app
     .ConfigureWebApplication()
     .MapEndpoints();
 
-app.Run();
+await app.RunAsync();

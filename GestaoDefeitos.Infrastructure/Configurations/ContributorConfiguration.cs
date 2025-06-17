@@ -8,8 +8,17 @@ namespace GestaoDefeitos.Infrastructure.Database.Configurations
     {
         public void Configure(EntityTypeBuilder<Contributor> builder)
         {
-            builder.Property(c => c.FullName)
-                .HasMaxLength(100);
+            builder.Property(c => c.Firstname)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            builder.Property(c => c.Lastname)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            builder.Property(c => c.Department)
+                .HasMaxLength(50)
+                .IsRequired();
 
             builder.Property(c => c.ContributorProfession)
                 .IsRequired();

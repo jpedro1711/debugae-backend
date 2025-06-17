@@ -32,12 +32,7 @@ namespace GestaoDefeitos.WebApi.Middleware
         {
             context.Response.ContentType = MediaTypeNames.Application.Json;
 
-            context.Response.StatusCode = e switch
-            {
-                //NotFoundException => (int)HttpStatusCode.NotFound,
-                //BadRequestException => (int)HttpStatusCode.BadRequest,
-                _ => (int)HttpStatusCode.InternalServerError
-            };
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
             var result = JsonSerializer.Serialize(new { message = e.Message });
             await context.Response.WriteAsync(result);

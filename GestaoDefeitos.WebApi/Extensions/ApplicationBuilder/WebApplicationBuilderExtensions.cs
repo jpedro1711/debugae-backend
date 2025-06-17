@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.Assembly;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Infrastructure.Database;
 using GestaoDefeitos.Infrastructure.Repositories;
@@ -42,6 +43,12 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
             builder.Services.AddScoped<ITagRepository, TagRepository>();
 
+            return builder;
+        }
+
+        public static WebApplicationBuilder ConfigureMediator(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<IApplicationMarker>());
             return builder;
         }
 

@@ -1,7 +1,6 @@
-﻿using GestaoDefeitos.Application.Requests;
-using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.UseCases.AppContributor.Register;
 using GestaoDefeitos.Infrastructure.Database;
-using Microsoft.AspNetCore.Identity;
+using MediatR;
 using System.Security.Claims;
 
 namespace GestaoDefeitos.WebApi.Endpoints
@@ -34,22 +33,15 @@ namespace GestaoDefeitos.WebApi.Endpoints
         public static RouteGroupBuilder MapCreateContributorEndpoint(this RouteGroupBuilder group)
         {
             group.MapPost("/register", async (
-                UserManager<Contributor> userManager,
-                RegisterContributorRequest request) =>
+                RegisterContributorCommand command,
+                IMediator mediator) =>
             {
-                var user = new Contributor
-                {
-                    Email = request.Email,
-                    FullName = request.FullName,
-                    UserName = request.Email,
-                };
+                var id = await mediator.Send(command);
 
-                var result = await userManager.CreateAsync(user, request.Password);
-
-                if (!result.Succeeded)
-                    return Results.BadRequest(result.Errors);
-
-                return Results.Created($"/users/{user.Id}", new { user.Id, user.UserName, user.Email, user.FullName });
+                return (id is not null) 
+                    ? Results.Created($"/contributors/{id.ContributorId}", id)
+                    : Results.BadRequest("Failed to create contributor.");
+            
             });
 
             return group;
