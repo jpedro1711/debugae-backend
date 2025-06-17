@@ -11,6 +11,7 @@ builder
 var app = builder.Build();
 
 app
+    .UseMiddlewares()
     .ConfigureWebApplication()
     .MapEndpoints();
 

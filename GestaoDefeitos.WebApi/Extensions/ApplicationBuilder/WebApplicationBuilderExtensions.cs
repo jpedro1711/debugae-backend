@@ -4,6 +4,7 @@ using GestaoDefeitos.Infrastructure.Database;
 using GestaoDefeitos.Infrastructure.Repositories;
 using GestaoDefeitos.WebApi.Endpoints;
 using GestaoDefeitos.WebApi.Extensions.Migrations;
+using GestaoDefeitos.WebApi.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -97,6 +98,13 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
         public static WebApplication MapEndpoints(this WebApplication webApplication)
         {
             webApplication.MapContributorEndpoints();
+
+            return webApplication;
+        }
+
+        public static WebApplication UseMiddlewares(this WebApplication webApplication)
+        {
+            webApplication.UseMiddleware<ErrorMiddleware>();
 
             return webApplication;
         }

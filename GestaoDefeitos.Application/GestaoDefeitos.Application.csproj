@@ -9,7 +9,9 @@
   <ItemGroup>
     <Folder Include="Mappings\" />
     <Folder Include="Responses\" />
-    <Folder Include="UseCases\" />
+    <Folder Include="UseCases\Defect\CreateDefect\" />
+    <Folder Include="UseCases\Defect\GetDefectsByProject\" />
+    <Folder Include="UseCases\Defect\UpdateDefect\" />
   </ItemGroup>
 
   <ItemGroup>
