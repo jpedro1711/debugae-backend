@@ -2,7 +2,7 @@ using GestaoDefeitos.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace GestaoDefeitos.Infrastructure.Database.Configurations
+namespace GestaoDefeitos.Infrastructure.Configurations
 {
     public class ContributorConfiguration : IEntityTypeConfiguration<Contributor>
     {

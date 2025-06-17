@@ -1,6 +1,6 @@
 ﻿using GestaoDefeitos.Domain.Enums;
 
-namespace GestaoDefeitos.Domain.Entities.RelationEntities
+namespace GestaoDefeitos.Domain.Entities
 {
     public class ProjectContributor
     {
@@ -9,7 +9,7 @@ namespace GestaoDefeitos.Domain.Entities.RelationEntities
         public Guid ContributorId { get; set; }
         public Contributor Contributor { get; set; } = null!;
         public ProjectRole Role { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }
 }

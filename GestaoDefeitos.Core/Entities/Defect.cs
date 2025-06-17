@@ -8,7 +8,7 @@ namespace GestaoDefeitos.Domain.Entities
         public Guid ProjectId { get; set; }
         public Project Project { get; set; } = null!;
         public Guid AssignedToContributorId { get; set; }
-        public Contributor AssignedToContributor { get; set; }
+        public Contributor AssignedToContributor { get; set; } = null!;
         public string Summary { get; set; } = null!;
         public string Description { get; set; } = null!;
         public DefectCategory DefectCategory { get; set; }
@@ -24,7 +24,7 @@ namespace GestaoDefeitos.Domain.Entities
         public DefectStatus Status { get; set; }
         public List<DefectComment> Comments { get; set; } = [];
         public List<DefectHistory> History { get; set; } = [];
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }
 }

@@ -1,7 +1,6 @@
-﻿using GestaoDefeitos.Domain.AspNetIdentity;
-using GestaoDefeitos.Domain.Entities;
-using GestaoDefeitos.Domain.Entities.RelationEntities;
-using GestaoDefeitos.Infrastructure.Database.Configurations;
+﻿using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.Identity;
+using GestaoDefeitos.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

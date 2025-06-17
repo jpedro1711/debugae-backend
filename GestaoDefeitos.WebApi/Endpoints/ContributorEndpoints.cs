@@ -1,4 +1,4 @@
-﻿using GestaoDefeitos.Application.UseCases.AppContributor.Register;
+﻿using GestaoDefeitos.Application.UseCases.ContributorUseCases.Register;
 using GestaoDefeitos.Infrastructure.Database;
 using MediatR;
 using System.Security.Claims;

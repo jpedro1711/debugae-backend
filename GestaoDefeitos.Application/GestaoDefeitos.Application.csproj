@@ -8,13 +8,14 @@
 
   <ItemGroup>
     <Folder Include="Mappings\" />
-    <Folder Include="UseCases\Defect\CreateDefect\" />
-    <Folder Include="UseCases\Defect\GetDefectsByProject\" />
-    <Folder Include="UseCases\Defect\UpdateDefect\" />
+    <Folder Include="UseCases\DefectUseCases\CreateDefect\" />
+    <Folder Include="UseCases\DefectUseCases\GetDefectsByProject\" />
+    <Folder Include="UseCases\DefectUseCases\UpdateDefect\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="12.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup>

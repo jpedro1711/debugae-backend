@@ -1,5 +1,4 @@
-﻿using GestaoDefeitos.Domain.Entities.RelationEntities;
-using GestaoDefeitos.Domain.Enums;
+﻿using GestaoDefeitos.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace GestaoDefeitos.Domain.Entities

@@ -28,7 +28,7 @@ namespace GestaoDefeitos.WebApi.Middleware
             }
         }
 
-        private async Task HandleException(HttpContext context, Exception e)
+        private static async Task HandleException(HttpContext context, Exception e)
         {
             context.Response.ContentType = MediaTypeNames.Application.Json;
 

@@ -1,7 +1,7 @@
 ﻿using GestaoDefeitos.Domain.Enums;
 using MediatR;
 
-namespace GestaoDefeitos.Application.UseCases.AppContributor.Register
+namespace GestaoDefeitos.Application.UseCases.ContributorUseCases.Register
 {
     public record RegisterContributorCommand(
             string Firstname,

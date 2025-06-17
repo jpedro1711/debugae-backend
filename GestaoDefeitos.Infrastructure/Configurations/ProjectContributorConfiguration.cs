@@ -1,8 +1,8 @@
-using GestaoDefeitos.Domain.Entities.RelationEntities;
+using GestaoDefeitos.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace GestaoDefeitos.Infrastructure.Database.Configurations
+namespace GestaoDefeitos.Infrastructure.Configurations
 {
     public class ProjectContributorConfiguration : IEntityTypeConfiguration<ProjectContributor>
     {

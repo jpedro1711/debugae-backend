@@ -10,7 +10,7 @@ namespace GestaoDefeitos.Domain.Entities
         public DefectAction Action { get; set; }
         public string OldMetadataJson { get; set; } = null!;
         public string NewMetadataJson { get; set; } = null!;
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }
 }

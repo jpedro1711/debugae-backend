@@ -105,6 +105,7 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
         public static WebApplication MapEndpoints(this WebApplication webApplication)
         {
             webApplication.MapContributorEndpoints();
+            webApplication.MapProjectEndpoints();
 
             return webApplication;
         }

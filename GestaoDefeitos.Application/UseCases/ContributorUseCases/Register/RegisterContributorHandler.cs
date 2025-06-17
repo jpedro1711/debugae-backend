@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace GestaoDefeitos.Application.UseCases.AppContributor.Register
+namespace GestaoDefeitos.Application.UseCases.ContributorUseCases.Register
 {
     public class RegisterContributorHandler(UserManager<Contributor> userManager) : IRequestHandler<RegisterContributorCommand, RegisterContributorResponse?>
     {
