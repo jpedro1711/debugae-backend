@@ -14,11 +14,12 @@ namespace GestaoDefeitos.Domain.Entities
         public DefectCategory DefectCategory { get; set; }
         public DefectSeverity DefectSeverity { get; set; }
         public DefectEnvironment DefectEnvironment { get; set; }
+        public DefectPriority DefectPriority { get; set; }
         public string Version { get; set; } = null!;
         public string ExpectedBehaviour { get; set; } = null!;
         public string ActualBehaviour { get; set; } = null!;
         public string ErrorLog { get; set; } = string.Empty;
-        public List<DefectAttachment> Attachments { get; set; } = [];
+        public DefectAttachment Attachment { get; set; } = null!;
         public List<Tag> Tags { get; set; } = [];
         public DateTime ExpiresIn { get; set; }
         public DefectStatus Status { get; set; }
