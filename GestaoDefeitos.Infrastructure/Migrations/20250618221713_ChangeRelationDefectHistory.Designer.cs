@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestaoDefeitos.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250617134934_Initial")]
-    partial class Initial
+    [Migration("20250618221713_ChangeRelationDefectHistory")]
+    partial class ChangeRelationDefectHistory
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,137 +24,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationRole", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
-
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationRoleClaim", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationUserClaim", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims", (string)null);
-                });
-
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationUserLogin", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationUserRole", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationUserToken", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.Contributor", b =>
                 {
@@ -279,6 +148,9 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.Property<Guid>("AssignedToContributorId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("AttachmentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -286,6 +158,9 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("DefectEnvironment")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DefectPriority")
                         .HasColumnType("int");
 
                     b.Property<int>("DefectSeverity")
@@ -327,6 +202,8 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
                     b.HasIndex("AssignedToContributorId");
 
+                    b.HasIndex("AttachmentId");
+
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Defects");
@@ -341,14 +218,15 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DefectId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<byte[]>("FileContent")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FileUri")
+                    b.Property<string>("FileType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -356,8 +234,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DefectId");
 
                     b.ToTable("DefectAttachments");
                 });
@@ -408,7 +284,7 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DefectId")
+                    b.Property<Guid>("DefectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("NewMetadataJson")
@@ -425,8 +301,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ContributorId");
-
-                    b.HasIndex("DefectId");
 
                     b.ToTable("DefectHistory");
                 });
@@ -456,7 +330,7 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("GestaoDefeitos.Domain.Entities.RelationEntities.ProjectContributor", b =>
+            modelBuilder.Entity("GestaoDefeitos.Domain.Entities.ProjectContributor", b =>
                 {
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
@@ -506,55 +380,135 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationRoleClaim", b =>
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationRole", b =>
                 {
-                    b.HasOne("GestaoDefeitos.Domain.AspNetIdentity.ApplicationRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationUserClaim", b =>
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationRoleClaim", b =>
                 {
-                    b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationUserLogin", b =>
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationUserClaim", b =>
                 {
-                    b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationUserRole", b =>
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationUserLogin", b =>
                 {
-                    b.HasOne("GestaoDefeitos.Domain.AspNetIdentity.ApplicationRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("GestaoDefeitos.Domain.AspNetIdentity.ApplicationUserToken", b =>
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationUserRole", b =>
                 {
-                    b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationUserToken", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.ContributorNotification", b =>
@@ -576,6 +530,12 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GestaoDefeitos.Domain.Entities.DefectAttachment", "Attachment")
+                        .WithMany()
+                        .HasForeignKey("AttachmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GestaoDefeitos.Domain.Entities.Project", "Project")
                         .WithMany("Defects")
                         .HasForeignKey("ProjectId")
@@ -584,14 +544,9 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
                     b.Navigation("AssignedToContributor");
 
-                    b.Navigation("Project");
-                });
+                    b.Navigation("Attachment");
 
-            modelBuilder.Entity("GestaoDefeitos.Domain.Entities.DefectAttachment", b =>
-                {
-                    b.HasOne("GestaoDefeitos.Domain.Entities.Defect", null)
-                        .WithMany("Attachments")
-                        .HasForeignKey("DefectId");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.DefectComment", b =>
@@ -617,14 +572,10 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GestaoDefeitos.Domain.Entities.Defect", null)
-                        .WithMany("History")
-                        .HasForeignKey("DefectId");
-
                     b.Navigation("Contributor");
                 });
 
-            modelBuilder.Entity("GestaoDefeitos.Domain.Entities.RelationEntities.ProjectContributor", b =>
+            modelBuilder.Entity("GestaoDefeitos.Domain.Entities.ProjectContributor", b =>
                 {
                     b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", "Contributor")
                         .WithMany("ProjectContributors")
@@ -650,6 +601,57 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .HasForeignKey("DefectId");
                 });
 
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationRoleClaim", b =>
+                {
+                    b.HasOne("GestaoDefeitos.Domain.Identity.ApplicationRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationUserClaim", b =>
+                {
+                    b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationUserLogin", b =>
+                {
+                    b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationUserRole", b =>
+                {
+                    b.HasOne("GestaoDefeitos.Domain.Identity.ApplicationRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationUserToken", b =>
+                {
+                    b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.Contributor", b =>
                 {
                     b.Navigation("ProjectContributors");
@@ -657,11 +659,7 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.Defect", b =>
                 {
-                    b.Navigation("Attachments");
-
                     b.Navigation("Comments");
-
-                    b.Navigation("History");
 
                     b.Navigation("Tags");
                 });

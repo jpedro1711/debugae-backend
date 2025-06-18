@@ -1,6 +1,12 @@
 ﻿namespace GestaoDefeitos.Domain.ViewModels
 {
-    public record UsersProjectViewModel(string projectId, string ProjectName, string ProjectDescription, int MembersCount, string UserProjectRole)
+    public record UsersProjectViewModel(
+        string ProjectId,
+        string ProjectName, 
+        string ProjectDescription, 
+        int MembersCount, 
+        string UserProjectRole
+        )
     {
     }
 }

@@ -21,18 +21,18 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 
             if (command.Attachment is not null)
             {
-                newDefect.Attachment = await SaveDefectAttachment(command.Attachment, defectAttachmentRepository);
+                var savedAttachment = await SaveDefectAttachment(command.Attachment, defectAttachmentRepository);
+                newDefect.Attachment = savedAttachment;
+                newDefect.AttachmentId = savedAttachment.Id;
             }
 
             newDefect.ExpiresIn = GetDefectExpirationDate(newDefect);
 
             var loggedUserId = Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            var savedCretionHistory = await CreateDefectHistory(newDefect, defectHistoryRepository, loggedUserId);
-
-            newDefect.History.Add(savedCretionHistory);
-
             var savedDefect = await defectRepository.AddAsync(newDefect);
+
+            await CreateDefectHistory(newDefect, defectHistoryRepository, loggedUserId);
 
             return new CreateDefectResponse(savedDefect.Id.ToString());
         }
@@ -84,6 +84,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             var history = new DefectHistory
             {
                 Id = Guid.NewGuid(),
+                DefectId = defect.Id,
                 ContributorId = contributorId,
                 Action = DefectAction.Create,
                 OldMetadataJson = string.Empty,

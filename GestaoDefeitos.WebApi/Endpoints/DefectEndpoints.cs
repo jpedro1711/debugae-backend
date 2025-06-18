@@ -1,4 +1,7 @@
 ﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectsByProject;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.GetUserDefects;
+using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetUserProjects;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +15,8 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 .WithTags("Defects");
 
             group.MapCreateDefectEndpoint();
+            group.MapGetProjectDefects();
+            group.MapGetUserDefects();
 
             return endpoints;
         }
@@ -33,5 +38,40 @@ namespace GestaoDefeitos.WebApi.Endpoints
 
             return group;
         }
+
+        public static RouteGroupBuilder MapGetProjectDefects(this RouteGroupBuilder group)
+        {
+            group.MapGet("/getProjectDefects", async (
+                [FromQuery] Guid projectId,
+                IMediator mediator) =>
+            {
+                GetDefectsByProjectQuery query = new GetDefectsByProjectQuery(projectId);
+                var defects = await mediator.Send(query);
+
+                return (defects is not null)
+                    ? Results.Ok(defects)
+                    : Results.BadRequest("Failed to fetch project defects.");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapGetUserDefects(this RouteGroupBuilder group)
+        {
+            group.MapGet("/getCurrentUserDefects", async (
+                IMediator mediator) =>
+            {
+                var userDefects = await mediator.Send(new GetUserDefectsQuery());
+
+                return (userDefects is not null)
+                    ? Results.Ok(userDefects)
+                    : Results.BadRequest("Failed to fetch user defects.");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
     }
 }

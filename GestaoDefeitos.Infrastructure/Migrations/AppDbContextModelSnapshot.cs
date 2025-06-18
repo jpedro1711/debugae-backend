@@ -145,7 +145,7 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.Property<Guid>("AssignedToContributorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AttachmentId")
+                    b.Property<Guid?>("AttachmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -281,7 +281,7 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DefectId")
+                    b.Property<Guid>("DefectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("NewMetadataJson")
@@ -298,8 +298,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ContributorId");
-
-                    b.HasIndex("DefectId");
 
                     b.ToTable("DefectHistory");
                 });
@@ -531,9 +529,7 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
                     b.HasOne("GestaoDefeitos.Domain.Entities.DefectAttachment", "Attachment")
                         .WithMany()
-                        .HasForeignKey("AttachmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AttachmentId");
 
                     b.HasOne("GestaoDefeitos.Domain.Entities.Project", "Project")
                         .WithMany("Defects")
@@ -570,10 +566,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .HasForeignKey("ContributorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("GestaoDefeitos.Domain.Entities.Defect", null)
-                        .WithMany("History")
-                        .HasForeignKey("DefectId");
 
                     b.Navigation("Contributor");
                 });
@@ -663,8 +655,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.Defect", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("History");
 
                     b.Navigation("Tags");
                 });

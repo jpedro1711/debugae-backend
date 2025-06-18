@@ -19,12 +19,12 @@ namespace GestaoDefeitos.Domain.Entities
         public string ExpectedBehaviour { get; set; } = null!;
         public string ActualBehaviour { get; set; } = null!;
         public string ErrorLog { get; set; } = string.Empty;
-        public DefectAttachment Attachment { get; set; } = null!;
+        public Guid? AttachmentId { get; set; }
+        public DefectAttachment? Attachment { get; set; } = null!;
         public List<Tag> Tags { get; set; } = [];
         public DateTime ExpiresIn { get; set; }
         public DefectStatus Status { get; set; }
         public List<DefectComment> Comments { get; set; } = [];
-        public List<DefectHistory> History { get; set; } = [];
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }

@@ -8,8 +8,7 @@
 
   <ItemGroup>
     <Folder Include="Mappings\" />
-    <Folder Include="UseCases\DefectUseCases\GetDefectsByProject\" />
-    <Folder Include="UseCases\DefectUseCases\UpdateDefect\" />
+    <Folder Include="UseCases\DefectUseCases\UpdateDefectStatus\" />
   </ItemGroup>
 
   <ItemGroup>
