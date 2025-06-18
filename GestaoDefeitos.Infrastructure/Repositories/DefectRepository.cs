@@ -24,6 +24,24 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<DefectDuplicatesViewModel>> GetDefectsDuplicatedViewModelByProjectAsync(Guid projectId, CancellationToken cancellationToken)
+        {
+            return await _context.Defects
+                .Where(d => d.ProjectId == projectId)
+                .Select(d => new DefectDuplicatesViewModel
+                {
+                    ProjectId = d.ProjectId.ToString(),
+                    AssignedToUserId = d.AssignedToContributorId.ToString(),
+                    Summary = d.Summary,
+                    Description = d.Description,
+                    Category = d.DefectCategory,
+                    Severity = d.DefectSeverity,
+                    Environment = d.DefectEnvironment,
+                    Version = d.Version
+                })
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<List<DefectsSimplifiedViewModel>> GetDefectsByContributorAsync(Guid contributorId, CancellationToken cancellationToken)
         {
             return await _context.Defects

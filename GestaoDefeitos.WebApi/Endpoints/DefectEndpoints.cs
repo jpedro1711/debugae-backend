@@ -1,5 +1,6 @@
 ﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplicates;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectsByProject;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetUserDefects;
 using MediatR;
@@ -18,6 +19,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapGetProjectDefects();
             group.MapGetUserDefects();
             group.MapCreateOrRemoveDefectTag();
+            group.MapDetectDefectDuplicates();
 
             return endpoints;
         }
@@ -85,6 +87,23 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (tagResponse is not null)
                     ? Results.Ok(tagResponse)
                     : Results.BadRequest("Failed to create or remove defect tag");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapDetectDefectDuplicates(this RouteGroupBuilder group)
+        {
+            group.MapPost("/findDuplicates", async (
+                DetectDefectDuplicatesCommand command,
+                IMediator mediator) =>
+            {
+                var duplicates = await mediator.Send(command);
+
+                return (duplicates is not null)
+                    ? Results.Ok(duplicates)
+                    : Results.BadRequest("Failed to find duplicates");
 
             }).RequireAuthorization();
 
