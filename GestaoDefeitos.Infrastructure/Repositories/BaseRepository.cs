@@ -18,7 +18,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
             return await _context.Set<TEntity>().ToListAsync();
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id)
+        public async Task<TEntity?> GetByIdAsync(Guid id)
         {
             return await _context.Set<TEntity>().FindAsync(id);
         }
@@ -37,7 +37,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
             return entity;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(Guid id)
         {
             var entity = await _context.Set<TEntity>().FindAsync(id);
             if (entity != null)

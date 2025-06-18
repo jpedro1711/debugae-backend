@@ -1,7 +1,7 @@
-﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
+﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectsByProject;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetUserDefects;
-using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetUserProjects;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +17,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapCreateDefectEndpoint();
             group.MapGetProjectDefects();
             group.MapGetUserDefects();
+            group.MapCreateOrRemoveDefectTag();
 
             return endpoints;
         }
@@ -63,10 +64,27 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 IMediator mediator) =>
             {
                 var userDefects = await mediator.Send(new GetUserDefectsQuery());
-
+                
                 return (userDefects is not null)
                     ? Results.Ok(userDefects)
                     : Results.BadRequest("Failed to fetch user defects.");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapCreateOrRemoveDefectTag(this RouteGroupBuilder group)
+        {
+            group.MapPost("/tags", async (
+                AddOrRemoveTagCommand command,
+                IMediator mediator) =>
+            {
+                var tagResponse = await mediator.Send(command);
+
+                return (tagResponse is not null)
+                    ? Results.Ok(tagResponse)
+                    : Results.BadRequest("Failed to create or remove defect tag");
 
             }).RequireAuthorization();
 

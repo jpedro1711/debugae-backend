@@ -21,7 +21,6 @@ namespace GestaoDefeitos.Domain.Entities
         public string ErrorLog { get; set; } = string.Empty;
         public Guid? AttachmentId { get; set; }
         public DefectAttachment? Attachment { get; set; } = null!;
-        public List<Tag> Tags { get; set; } = [];
         public DateTime ExpiresIn { get; set; }
         public DefectStatus Status { get; set; }
         public List<DefectComment> Comments { get; set; } = [];
