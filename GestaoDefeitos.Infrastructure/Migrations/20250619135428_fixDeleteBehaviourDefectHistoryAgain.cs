@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GestaoDefeitos.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class ChangeRelationDefectHistory : Migration
+    public partial class fixDeleteBehaviourDefectHistoryAgain : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,22 +55,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DefectAttachments",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileContent = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DefectAttachments", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Projects",
                 columns: table => new
                 {
@@ -83,6 +67,21 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -213,30 +212,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DefectHistory",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ContributorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Action = table.Column<int>(type: "int", nullable: false),
-                    OldMetadataJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NewMetadataJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DefectHistory", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DefectHistory_AspNetUsers_ContributorId",
-                        column: x => x.ContributorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Defects",
                 columns: table => new
                 {
@@ -253,7 +228,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     ExpectedBehaviour = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ActualBehaviour = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ErrorLog = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AttachmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExpiresIn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -266,12 +240,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         name: "FK_Defects_AspNetUsers_AssignedToContributorId",
                         column: x => x.AssignedToContributorId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Defects_DefectAttachments_AttachmentId",
-                        column: x => x.AttachmentId,
-                        principalTable: "DefectAttachments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -310,15 +278,38 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DefectAttachments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileContent = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DefectAttachments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DefectAttachments_Defects_DefectId",
+                        column: x => x.DefectId,
+                        principalTable: "Defects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DefectComments",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContributorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -337,23 +328,56 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tags",
+                name: "DefectHistory",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContributorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Action = table.Column<int>(type: "int", nullable: false),
+                    OldMetadataJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NewMetadataJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tags", x => x.Id);
+                    table.PrimaryKey("PK_DefectHistory", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tags_Defects_DefectId",
+                        name: "FK_DefectHistory_AspNetUsers_ContributorId",
+                        column: x => x.ContributorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DefectHistory_Defects_DefectId",
                         column: x => x.DefectId,
                         principalTable: "Defects",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DefectRelations",
+                columns: table => new
+                {
+                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RelatedDefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DefectRelations", x => new { x.DefectId, x.RelatedDefectId });
+                    table.ForeignKey(
+                        name: "FK_DefectRelations_Defects_DefectId",
+                        column: x => x.DefectId,
+                        principalTable: "Defects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DefectRelations_Defects_RelatedDefectId",
+                        column: x => x.RelatedDefectId,
+                        principalTable: "Defects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -401,6 +425,12 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 column: "ContributorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DefectAttachments_DefectId",
+                table: "DefectAttachments",
+                column: "DefectId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DefectComments_ContributorId",
                 table: "DefectComments",
                 column: "ContributorId");
@@ -416,14 +446,19 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 column: "ContributorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DefectHistory_DefectId",
+                table: "DefectHistory",
+                column: "DefectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DefectRelations_RelatedDefectId",
+                table: "DefectRelations",
+                column: "RelatedDefectId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Defects_AssignedToContributorId",
                 table: "Defects",
                 column: "AssignedToContributorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Defects_AttachmentId",
-                table: "Defects",
-                column: "AttachmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Defects_ProjectId",
@@ -434,11 +469,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 name: "IX_ProjectContributors_ContributorId",
                 table: "ProjectContributors",
                 column: "ContributorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tags_DefectId",
-                table: "Tags",
-                column: "DefectId");
         }
 
         /// <inheritdoc />
@@ -463,10 +493,16 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 name: "ContributorNotifications");
 
             migrationBuilder.DropTable(
+                name: "DefectAttachments");
+
+            migrationBuilder.DropTable(
                 name: "DefectComments");
 
             migrationBuilder.DropTable(
                 name: "DefectHistory");
+
+            migrationBuilder.DropTable(
+                name: "DefectRelations");
 
             migrationBuilder.DropTable(
                 name: "ProjectContributors");
@@ -482,9 +518,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "DefectAttachments");
 
             migrationBuilder.DropTable(
                 name: "Projects");

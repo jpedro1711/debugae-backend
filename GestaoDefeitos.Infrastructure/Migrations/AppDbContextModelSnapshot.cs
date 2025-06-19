@@ -145,9 +145,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.Property<Guid>("AssignedToContributorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("AttachmentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -199,8 +196,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
                     b.HasIndex("AssignedToContributorId");
 
-                    b.HasIndex("AttachmentId");
-
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Defects");
@@ -214,6 +209,9 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DefectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("FileContent")
                         .IsRequired()
@@ -231,6 +229,9 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DefectId")
+                        .IsUnique();
 
                     b.ToTable("DefectAttachments");
                 });
@@ -251,7 +252,7 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DefectId")
+                    b.Property<Guid>("DefectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -298,6 +299,8 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ContributorId");
+
+                    b.HasIndex("DefectId");
 
                     b.ToTable("DefectHistory");
                 });
@@ -540,10 +543,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GestaoDefeitos.Domain.Entities.DefectAttachment", "Attachment")
-                        .WithMany()
-                        .HasForeignKey("AttachmentId");
-
                     b.HasOne("GestaoDefeitos.Domain.Entities.Project", "Project")
                         .WithMany("Defects")
                         .HasForeignKey("ProjectId")
@@ -552,9 +551,18 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
                     b.Navigation("AssignedToContributor");
 
-                    b.Navigation("Attachment");
-
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("GestaoDefeitos.Domain.Entities.DefectAttachment", b =>
+                {
+                    b.HasOne("GestaoDefeitos.Domain.Entities.Defect", "Defect")
+                        .WithOne("Attachment")
+                        .HasForeignKey("GestaoDefeitos.Domain.Entities.DefectAttachment", "DefectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Defect");
                 });
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.DefectComment", b =>
@@ -565,11 +573,15 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GestaoDefeitos.Domain.Entities.Defect", null)
+                    b.HasOne("GestaoDefeitos.Domain.Entities.Defect", "Defect")
                         .WithMany("Comments")
-                        .HasForeignKey("DefectId");
+                        .HasForeignKey("DefectId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
 
                     b.Navigation("Contributor");
+
+                    b.Navigation("Defect");
                 });
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.DefectHistory", b =>
@@ -580,7 +592,15 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GestaoDefeitos.Domain.Entities.Defect", "Defect")
+                        .WithMany("DefectHistory")
+                        .HasForeignKey("DefectId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
                     b.Navigation("Contributor");
+
+                    b.Navigation("Defect");
                 });
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.DefectRelation", b =>
@@ -588,7 +608,7 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.HasOne("GestaoDefeitos.Domain.Entities.Defect", "Defect")
                         .WithMany("RelatedDefects")
                         .HasForeignKey("DefectId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GestaoDefeitos.Domain.Entities.Defect", "RelatedDefect")
@@ -679,7 +699,11 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.Defect", b =>
                 {
+                    b.Navigation("Attachment");
+
                     b.Navigation("Comments");
+
+                    b.Navigation("DefectHistory");
 
                     b.Navigation("RelatedDefects");
 

@@ -1,7 +1,6 @@
 ﻿using GestaoDefeitos.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Reflection.Emit;
 
 namespace GestaoDefeitos.Infrastructure.Configurations
 {
@@ -16,7 +15,7 @@ namespace GestaoDefeitos.Infrastructure.Configurations
                 .HasOne(dr => dr.Defect)
                 .WithMany(d => d.RelatedDefects)
                 .HasForeignKey(dr => dr.DefectId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .HasOne(dr => dr.RelatedDefect)

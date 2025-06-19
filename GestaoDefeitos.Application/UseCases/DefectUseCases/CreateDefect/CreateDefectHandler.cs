@@ -20,18 +20,14 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
         {
             var newDefect = MapCommandToNewDefect(command);
 
-            if (command.Attachment is not null)
-            {
-                var savedAttachment = await SaveDefectAttachment(command.Attachment, defectAttachmentRepository);
-                newDefect.Attachment = savedAttachment;
-                newDefect.AttachmentId = savedAttachment.Id;
-            }
-
             newDefect.ExpiresIn = GetDefectExpirationDate(newDefect);
 
             var loggedUserId = Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
             var savedDefect = await defectRepository.AddAsync(newDefect);
+
+            if (command.Attachment is not null)
+                await SaveDefectAttachment(command.Attachment, defectAttachmentRepository, newDefect);
 
             await CreateDefectHistory(newDefect, defectHistoryRepository, loggedUserId);
 
@@ -42,31 +38,21 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 
         private async Task RelateToDuplicates(CreateDefectCommand command, IDefectRepository defectRepository, Guid savedDefectId)
         {
-            List<Guid> duplicatesGuids;
+            if (command.DuplicatesIds is null) return;
 
-            if (command.DuplicatesIds.Count == 1 && command.DuplicatesIds[0].StartsWith("["))
-            {
-                duplicatesGuids = JsonConvert.DeserializeObject<List<Guid>>(command.DuplicatesIds[0])!;
-            }
-            else
-            {
-                duplicatesGuids = command.DuplicatesIds.Select(id => Guid.Parse(id)).ToList();
-            }
+            var duplicatesGuids = JsonConvert.DeserializeObject<List<Guid>>(command.DuplicatesIds[0])!;
 
             foreach (var duplicateId in duplicatesGuids)
             {
                 var duplicateDefect = await defectRepository.GetByIdAsync(duplicateId);
                 if (duplicateDefect != null)
-                {
                     await defectRelationRepository.AddAsync(new DefectRelation
                     {
                         DefectId = savedDefectId,
                         RelatedDefectId = duplicateDefect.Id,
                     });
-                }
             }
         }
-
 
         private static Defect MapCommandToNewDefect(CreateDefectCommand command)
         {
@@ -89,7 +75,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             };
         }
 
-        private static async Task<DefectAttachment> SaveDefectAttachment(IFormFile attachment, IDefectAttachmentRepository repository)
+        private static async Task<DefectAttachment> SaveDefectAttachment(IFormFile attachment, IDefectAttachmentRepository repository, Defect newDefect)
         {
             using var memoryStream = new MemoryStream();
             await attachment.CopyToAsync(memoryStream);
@@ -99,9 +85,12 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
                 FileName = attachment.FileName,
                 FileType = attachment.ContentType,
                 FileContent = memoryStream.ToArray(),
+                DefectId = newDefect.Id
             };
 
             var savedAttachment = await repository.AddAsync(Attachment);
+
+            newDefect.Attachment = savedAttachment;
 
             return savedAttachment;
         }
@@ -119,7 +108,10 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
                 ContributorId = contributorId,
                 Action = DefectAction.Create,
                 OldMetadataJson = string.Empty,
-                NewMetadataJson = System.Text.Json.JsonSerializer.Serialize(defect),
+                NewMetadataJson = JsonConvert.SerializeObject(defect, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                }),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null,
             };

@@ -3,6 +3,8 @@
     public class DefectComment
     {
         public Guid Id { get; set; }
+        public Guid DefectId { get; set; }
+        public Defect Defect { get; set; } = null!;
         public string Content { get; set; } = null!;
         public Guid ContributorId { get; set; }
         public Contributor Contributor { get; set; } = null!;

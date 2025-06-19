@@ -37,6 +37,8 @@ namespace GestaoDefeitos.Infrastructure.Database
             builder.ApplyConfiguration(new ContributorConfiguration());
             builder.ApplyConfiguration(new ProjectContributorConfiguration());
             builder.ApplyConfiguration(new DefectRelationConfiguration());
+            builder.ApplyConfiguration(new DefectHistoryConfigurations());
+            builder.ApplyConfiguration(new DefectCommentConfiguration());
         }
     }
 }

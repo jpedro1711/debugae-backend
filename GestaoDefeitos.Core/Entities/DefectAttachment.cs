@@ -3,6 +3,8 @@
     public class DefectAttachment
     {
         public Guid Id { get; set; }
+        public Guid DefectId { get; set; }
+        public Defect Defect { get; set; } = null!;
         public string FileName { get; set; } = null!;
         public string FileType { get; set; } = null!;
         public byte[] FileContent { get; set; } = [];

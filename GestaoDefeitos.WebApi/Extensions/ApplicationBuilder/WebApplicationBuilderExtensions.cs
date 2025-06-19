@@ -1,7 +1,6 @@
 ﻿using GestaoDefeitos.Application.Assembly;
 using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
-using GestaoDefeitos.Infrastructure.Configurations;
 using GestaoDefeitos.Infrastructure.Database;
 using GestaoDefeitos.Infrastructure.Repositories;
 using GestaoDefeitos.WebApi.Endpoints;
@@ -9,6 +8,7 @@ using GestaoDefeitos.WebApi.Extensions.Migrations;
 using GestaoDefeitos.WebApi.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
 {
@@ -16,7 +16,10 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
     {
         public static WebApplicationBuilder AddBaseServices(this WebApplicationBuilder builder)
         {
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
