@@ -32,7 +32,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             var savedDefect = await defectRepository.AddAsync(newDefect);
 
             if (command.Attachment is not null)
-                await SaveDefectAttachment(command.Attachment, defectAttachmentRepository, newDefect);
+                await SaveDefectAttachment(command.Attachment, defectAttachmentRepository, newDefect, loggedUserId);
 
             // Someone if assigned the defect to other user, so we have to notify the assigned user
             if (new Guid(command.AssignedToUserId) != loggedUserId)
@@ -111,7 +111,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             };
         }
 
-        private static async Task<DefectAttachment> SaveDefectAttachment(IFormFile attachment, IDefectAttachmentRepository repository, Defect newDefect)
+        private static async Task<DefectAttachment> SaveDefectAttachment(IFormFile attachment, IDefectAttachmentRepository repository, Defect newDefect, Guid uploadedById)
         {
             using var memoryStream = new MemoryStream();
             await attachment.CopyToAsync(memoryStream);
