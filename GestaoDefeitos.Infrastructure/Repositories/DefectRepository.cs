@@ -30,6 +30,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 .Where(d => d.ProjectId == projectId)
                 .Select(d => new DefectDuplicatesViewModel
                 {
+                    DefectId = d.Id,
                     ProjectId = d.ProjectId.ToString(),
                     AssignedToUserId = d.AssignedToContributorId.ToString(),
                     Summary = d.Summary,

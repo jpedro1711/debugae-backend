@@ -4,6 +4,7 @@ namespace GestaoDefeitos.Domain.ViewModels
 {
     public class DefectDuplicatesViewModel
     {
+        public Guid DefectId { get; set; }
         public required string ProjectId { get; set; }
         public required string AssignedToUserId { get; set; }
         public required string Summary { get; set; }

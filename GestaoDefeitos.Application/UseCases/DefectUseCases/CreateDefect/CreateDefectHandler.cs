@@ -3,8 +3,8 @@ using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System.Security.Claims;
-using System.Text.Json;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 {
@@ -12,7 +12,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
         IDefectRepository defectRepository,
         IDefectAttachmentRepository defectAttachmentRepository,
         IDefectHistoryRepository defectHistoryRepository,
-        IHttpContextAccessor httpContextAccessor
+        IHttpContextAccessor httpContextAccessor,
+        IDefectRelationRepository defectRelationRepository
         ) : IRequestHandler<CreateDefectCommand, CreateDefectResponse?>
     {
         public async Task<CreateDefectResponse?> Handle(CreateDefectCommand command, CancellationToken cancellationToken)
@@ -34,8 +35,38 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 
             await CreateDefectHistory(newDefect, defectHistoryRepository, loggedUserId);
 
+            await RelateToDuplicates(command, defectRepository, savedDefect.Id);
+
             return new CreateDefectResponse(savedDefect.Id.ToString());
         }
+
+        private async Task RelateToDuplicates(CreateDefectCommand command, IDefectRepository defectRepository, Guid savedDefectId)
+        {
+            List<Guid> duplicatesGuids;
+
+            if (command.DuplicatesIds.Count == 1 && command.DuplicatesIds[0].StartsWith("["))
+            {
+                duplicatesGuids = JsonConvert.DeserializeObject<List<Guid>>(command.DuplicatesIds[0])!;
+            }
+            else
+            {
+                duplicatesGuids = command.DuplicatesIds.Select(id => Guid.Parse(id)).ToList();
+            }
+
+            foreach (var duplicateId in duplicatesGuids)
+            {
+                var duplicateDefect = await defectRepository.GetByIdAsync(duplicateId);
+                if (duplicateDefect != null)
+                {
+                    await defectRelationRepository.AddAsync(new DefectRelation
+                    {
+                        DefectId = savedDefectId,
+                        RelatedDefectId = duplicateDefect.Id,
+                    });
+                }
+            }
+        }
+
 
         private static Defect MapCommandToNewDefect(CreateDefectCommand command)
         {
@@ -88,7 +119,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
                 ContributorId = contributorId,
                 Action = DefectAction.Create,
                 OldMetadataJson = string.Empty,
-                NewMetadataJson = JsonSerializer.Serialize(defect),
+                NewMetadataJson = System.Text.Json.JsonSerializer.Serialize(defect),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null,
             };

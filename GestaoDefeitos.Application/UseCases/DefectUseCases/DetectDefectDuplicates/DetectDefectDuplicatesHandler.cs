@@ -36,6 +36,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplica
                 .Where(d => d.Score >= 60) 
                 .Select(d => new DefectDuplicatesViewModel
                 {
+                    DefectId = d.Value.DefectId,
                     ProjectId = d.Value.ProjectId,
                     AssignedToUserId = d.Value.AssignedToUserId,
                     Summary = d.Value.Summary,

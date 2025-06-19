@@ -1,6 +1,7 @@
 ﻿using GestaoDefeitos.Application.Assembly;
 using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
+using GestaoDefeitos.Infrastructure.Configurations;
 using GestaoDefeitos.Infrastructure.Database;
 using GestaoDefeitos.Infrastructure.Repositories;
 using GestaoDefeitos.WebApi.Endpoints;
@@ -42,6 +43,7 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             builder.Services.AddScoped<IProjectContributorRepository, ProjectContributorRepository>();
             builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
             builder.Services.AddScoped<ITagRepository, TagRepository>();
+            builder.Services.AddScoped<IDefectRelationRepository, DefectRelationRepository>();
 
             return builder;
         }

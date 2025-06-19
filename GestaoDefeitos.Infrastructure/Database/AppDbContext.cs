@@ -29,12 +29,14 @@ namespace GestaoDefeitos.Infrastructure.Database
         public DbSet<DefectHistory> DefectHistory { get; set; }
         public DbSet<DefectComment> DefectComments { get; set; }
         public DbSet<DefectAttachment> DefectAttachments { get; set; }
+        public DbSet<DefectRelation> DefectRelations { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new ContributorConfiguration());
             builder.ApplyConfiguration(new ProjectContributorConfiguration());
+            builder.ApplyConfiguration(new DefectRelationConfiguration());
         }
     }
 }

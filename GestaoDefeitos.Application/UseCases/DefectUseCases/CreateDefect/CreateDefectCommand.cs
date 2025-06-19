@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 {
-    public class CreateDefectCommand : IRequest<CreateDefectResponse?>
+    public record CreateDefectCommand : IRequest<CreateDefectResponse?>
     {
         public required string ProjectId { get; set; }
         public required string AssignedToUserId { get; set; }
@@ -18,6 +18,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
         public required string ActualBehaviour { get; set; }
         public required string LogTrace { get; set; }
         public DefectPriority Priority { get; set; }
+        public List<string> DuplicatesIds { get; set; } = [];
         public IFormFile? Attachment { get; set; }
     }
 }
