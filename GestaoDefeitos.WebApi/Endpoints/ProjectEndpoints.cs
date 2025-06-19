@@ -1,6 +1,8 @@
 ﻿using GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject;
+using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetUserProjects;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GestaoDefeitos.WebApi.Endpoints
 {
@@ -13,6 +15,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
 
             group.MapCreateProjectEndpoint(); 
             group.MapGetUserProjects();
+            group.MapGetProjectDetails();
 
             return endpoints;
         }
@@ -44,6 +47,23 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (userProjects is not null)
                     ? Results.Ok(userProjects)
                     : Results.BadRequest("Failed to fetch user projects.");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapGetProjectDetails(this RouteGroupBuilder group)
+        {
+            group.MapGet("/projectDetails", async (
+                [FromQuery] Guid projectId,
+                IMediator mediator) =>
+            {
+                var projectDetails = await mediator.Send(new GetProjectDetailsQuery(projectId));
+
+                return (projectDetails is not null)
+                    ? Results.Ok(projectDetails)
+                    : Results.NotFound("Project not found.");
 
             }).RequireAuthorization();
 
