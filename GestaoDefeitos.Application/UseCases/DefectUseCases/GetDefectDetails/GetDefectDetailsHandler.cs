@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Domain.ViewModels;
 using MediatR;
@@ -15,10 +16,53 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
         {
             var defectDetails = await defectRepository.GetDefectDetailsProjectionAsync(query.DefectId, cancellationToken);
 
-            return CreateDefectDetailsResponse(defectDetails);
+            var changeHistory = await CreateDefectHistoryViewModel(
+                query.DefectId,
+                defectHistoryRepository,
+                cancellationToken
+            );
+
+            return CreateDefectDetailsResponse(defectDetails, changeHistory);
         }
 
-        private static GetDefectDetailsResponse? CreateDefectDetailsResponse(DefectAllDetailsViewModel? defect)
+        private async static Task<List<DefectHistoryViewModel>> CreateDefectHistoryViewModel(Guid defectId, IDefectHistoryRepository defectHistoryRepository, CancellationToken cancellationToken)
+        {
+            var consolidatedHistory = new List<DefectHistoryViewModel>();
+            var defectHistories = await defectHistoryRepository.GetDefectHistoryByDefectIdAsync(defectId, cancellationToken);
+
+            foreach (var history in defectHistories)
+            {
+                if (history.Action == DefectAction.Create)
+                    consolidatedHistory.Add(new DefectHistoryViewModel(
+                        DefectAction.Create.ToString(),
+                        null,
+                        null,
+                        null,
+                        history.Contributor.Id.ToString(),
+                        history.CreatedAt
+                    ));
+                else if (history.Action == DefectAction.Update)
+                {
+                    var differences = JsonComparer.CompareJson(
+                        history.OldMetadataJson,
+                        history.NewMetadataJson
+                    );
+
+                    differences.Select(dif => new DefectHistoryViewModel(
+                        DefectAction.Update.ToString(),
+                        dif.Field,
+                        dif.OldValue,
+                        dif.NewValue,
+                        history.Contributor.Id.ToString(),
+                        history.CreatedAt
+                    )).ToList().ForEach(dif => consolidatedHistory.Add(dif));
+                }
+            }
+
+            return consolidatedHistory;
+        }
+
+        private static GetDefectDetailsResponse? CreateDefectDetailsResponse(DefectAllDetailsViewModel? defect, List<DefectHistoryViewModel> changeHistory)
         {
 
             return new GetDefectDetailsResponse(
@@ -35,7 +79,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
                     defect?.Details,
                     defect?.Comments,
                     defect?.Attachment,
-                    defect?.RelatedDefects
+                    defect?.RelatedDefects,
+                    changeHistory
                 );
         }
     }

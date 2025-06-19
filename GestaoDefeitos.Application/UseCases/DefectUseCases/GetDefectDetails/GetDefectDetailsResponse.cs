@@ -16,6 +16,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
             DefectDetailsViewModel? Details,
             List<DefectCommentViewModel>? Comments,
             DefectAttachmentViewModel? Attachment,
-            List<DefectsSimplifiedViewModel>? RelatedDefects
+            List<DefectsSimplifiedViewModel>? RelatedDefects,
+            List<DefectHistoryViewModel> History
         );
 }

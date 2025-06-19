@@ -16,5 +16,14 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 .Include(dh => dh.Contributor)
                 .FirstOrDefaultAsync(cancellationToken);
         }
+
+        public async Task<List<DefectHistory>> GetDefectHistoryByDefectIdAsync(Guid defectId, CancellationToken cancellationToken)
+        {
+            return await _context.DefectHistory
+                .Where(history => history.DefectId == defectId)
+                .Include(dh => dh.Contributor)
+                .OrderByDescending(dh => dh.CreatedAt)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

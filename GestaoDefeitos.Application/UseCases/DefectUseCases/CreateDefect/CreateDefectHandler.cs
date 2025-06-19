@@ -27,12 +27,14 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 
             var loggedUserId = Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
+            var currentUserName = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+
             await ValidateProjectAndUser(command, projectContributorRepository, projectRepository);
 
             var savedDefect = await defectRepository.AddAsync(newDefect);
 
             if (command.Attachment is not null)
-                await SaveDefectAttachment(command.Attachment, defectAttachmentRepository, newDefect, loggedUserId);
+                await SaveDefectAttachment(command.Attachment, defectAttachmentRepository, newDefect, currentUserName ?? "Unknown user");
 
             // Someone if assigned the defect to other user, so we have to notify the assigned user
             if (new Guid(command.AssignedToUserId) != loggedUserId)
@@ -111,7 +113,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             };
         }
 
-        private static async Task<DefectAttachment> SaveDefectAttachment(IFormFile attachment, IDefectAttachmentRepository repository, Defect newDefect, Guid uploadedById)
+        private static async Task<DefectAttachment> SaveDefectAttachment(IFormFile attachment, IDefectAttachmentRepository repository, Defect newDefect, string uploadedByUsername)
         {
             using var memoryStream = new MemoryStream();
             await attachment.CopyToAsync(memoryStream);
@@ -121,7 +123,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
                 FileName = attachment.FileName,
                 FileType = attachment.ContentType,
                 FileContent = memoryStream.ToArray(),
-                DefectId = newDefect.Id
+                DefectId = newDefect.Id,
+                UploadByUsername = uploadedByUsername
             };
 
             var savedAttachment = await repository.AddAsync(Attachment);

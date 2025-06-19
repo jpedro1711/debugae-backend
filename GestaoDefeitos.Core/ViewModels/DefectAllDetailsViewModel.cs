@@ -11,12 +11,12 @@
         public string? DefectStatus { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public string? DefectCategory { get; set; }
-
         public DefectResponsibleContributorViewModel? ResponsibleContributor { get; set; }
         public DefectDetailsViewModel? Details { get; set; }
         public List<DefectCommentViewModel>? Comments { get; set; }
         public DefectAttachmentViewModel? Attachment { get; set; }
         public List<DefectsSimplifiedViewModel>? RelatedDefects { get; set; }
+        public DefectHistoryViewModel History { get; set; } = null!;
 
         public DefectAllDetailsViewModel() { }
 

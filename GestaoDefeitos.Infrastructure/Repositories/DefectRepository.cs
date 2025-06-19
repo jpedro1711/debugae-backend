@@ -99,7 +99,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         ? new DefectAttachmentViewModel(
                             d.Attachment.FileName,
                             d.Attachment.FileType,
-                            d.Attachment.CreatedAt
+                            d.Attachment.CreatedAt,
+                            d.Attachment.UploadByUsername
                         )
                         : null,
                     d.RelatedDefects.Select(rd => new DefectsSimplifiedViewModel(
