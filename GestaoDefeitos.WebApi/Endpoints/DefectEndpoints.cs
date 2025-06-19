@@ -3,6 +3,7 @@ using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplicates;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectsByProject;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetUserDefects;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapGetUserDefects();
             group.MapCreateOrRemoveDefectTag();
             group.MapDetectDefectDuplicates();
+            group.MapUpdateDefectStatus();
 
             return endpoints;
         }
@@ -104,6 +106,23 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (duplicates is not null)
                     ? Results.Ok(duplicates)
                     : Results.BadRequest("Failed to find duplicates");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapUpdateDefectStatus(this RouteGroupBuilder group)
+        {
+            group.MapPatch("/updateStatus", async (
+                UpdateDefectStatusCommand command,
+                IMediator mediator) =>
+            {
+                var updated = await mediator.Send(command);
+
+                return (updated is not null)
+                    ? Results.Ok(updated)
+                    : Results.BadRequest("Failed to update defect status");
 
             }).RequireAuthorization();
 
