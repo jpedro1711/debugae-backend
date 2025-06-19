@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag;
+﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.AddCommentToDefect;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplicates;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectsByProject;
@@ -22,6 +23,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapCreateOrRemoveDefectTag();
             group.MapDetectDefectDuplicates();
             group.MapUpdateDefectStatus();
+            group.MapAddCommentToDefect();
 
             return endpoints;
         }
@@ -123,6 +125,23 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (updated is not null)
                     ? Results.Ok(updated)
                     : Results.BadRequest("Failed to update defect status");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapAddCommentToDefect(this RouteGroupBuilder group)
+        {
+            group.MapPatch("/addComment", async (
+                AddCommentToDefectCommand command,
+                IMediator mediator) =>
+            {
+                var createdComment = await mediator.Send(command);
+
+                return (createdComment is not null)
+                    ? Results.Ok(createdComment)
+                    : Results.BadRequest("Failed to add comment to defect.");
 
             }).RequireAuthorization();
 
