@@ -112,6 +112,7 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             webApplication.MapContributorEndpoints();
             webApplication.MapProjectEndpoints();
             webApplication.MapDefectEndpoints();
+            webApplication.MapNotificationEndpoints();
 
             return webApplication;
         }

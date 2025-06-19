@@ -1,5 +1,4 @@
-﻿using GestaoDefeitos.Application.UseCases.ContributorUseCases.Register;
-using GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject;
+﻿using GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetUserProjects;
 using MediatR;
 

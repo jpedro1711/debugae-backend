@@ -25,5 +25,11 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 ))
                 .ToListAsync();
         }
+
+        public async Task<bool> IsUserOnProject(Guid userId, Guid projectId)
+        {
+            return await _context.ProjectContributors
+                .AnyAsync(pc => pc.ContributorId == userId && pc.ProjectId == projectId);
+        }
     }
 }

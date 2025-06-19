@@ -12,7 +12,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
         (
             IDefectRepository defectRepository, 
             IDefectHistoryRepository defectHistoryRepository,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            IContributorNotificationRepository contributorNotificationRepository
         ) : IRequestHandler<UpdateDefectStatusCommand, UpdateDefectStatusResponse?>
     {
         public async Task<UpdateDefectStatusResponse?> Handle(UpdateDefectStatusCommand request, CancellationToken cancellationToken)
@@ -49,12 +50,28 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 });
                 await defectHistoryRepository.AddAsync(defectHistory);
+
+                if (loggedUserId != defect.AssignedToContributorId)
+                    await SaveUserNotification(defect.AssignedToContributorId, contributorNotificationRepository, updatedDefect.Id);
+
                 return new UpdateDefectStatusResponse(defect.Id, defect.Status);
             }
 
             return null;
         }
 
+        private static async Task SaveUserNotification(Guid userId, IContributorNotificationRepository notificationRepository, Guid defectId)
+        {
+            var notification = new ContributorNotification
+            {
+                Id = Guid.NewGuid(),
+                ContributorId = userId,
+                Content = $"Some of your defects had a status change - {defectId}",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
 
+            await notificationRepository.AddAsync(notification);
+        }
     }
 }

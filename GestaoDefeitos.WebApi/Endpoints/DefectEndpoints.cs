@@ -52,7 +52,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 [FromQuery] Guid projectId,
                 IMediator mediator) =>
             {
-                GetDefectsByProjectQuery query = new GetDefectsByProjectQuery(projectId);
+                GetDefectsByProjectQuery query = new(projectId);
                 var defects = await mediator.Send(query);
 
                 return (defects is not null)

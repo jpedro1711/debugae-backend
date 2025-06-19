@@ -4,16 +4,10 @@ using System.Text.Json;
 
 namespace GestaoDefeitos.WebApi.Middleware
 {
-    public class ErrorMiddleware
+    public class ErrorMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger _log;
-
-        public ErrorMiddleware(RequestDelegate next, ILoggerFactory log)
-        {
-            _next = next;
-            _log = log.CreateLogger("Error handler");
-        }
+        private readonly RequestDelegate _next = next;
+        private readonly ILogger _log = loggerFactory.CreateLogger("Error handler");
 
         public async Task Invoke(HttpContext context)
         {
@@ -23,7 +17,7 @@ namespace GestaoDefeitos.WebApi.Middleware
             }
             catch (Exception ex)
             {
-                _log.LogError(ex, ex.Message);
+                _log.LogError(ex, "An unexpected error occurred: {Message}", ex.Message);
                 await HandleException(context, ex);
             }
         }
@@ -33,6 +27,9 @@ namespace GestaoDefeitos.WebApi.Middleware
             context.Response.ContentType = MediaTypeNames.Application.Json;
 
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            if (e is InvalidOperationException)
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
             var result = JsonSerializer.Serialize(new { message = e.Message });
             await context.Response.WriteAsync(result);

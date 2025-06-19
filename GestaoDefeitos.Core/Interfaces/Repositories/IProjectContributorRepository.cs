@@ -6,5 +6,6 @@ namespace GestaoDefeitos.Domain.Interfaces.Repositories
     public interface IProjectContributorRepository : IBaseRepository<ProjectContributor>
     {
         Task<List<UsersProjectViewModel>> GetProjectContributorsByUserIdAsync(Guid userId);
+        Task<bool> IsUserOnProject(Guid userId, Guid projectId);
     }
 }

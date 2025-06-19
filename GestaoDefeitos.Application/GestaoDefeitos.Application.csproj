@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="UseCases\Notifications\NewFolder\**" />
+    <EmbeddedResource Remove="UseCases\Notifications\NewFolder\**" />
+    <None Remove="UseCases\Notifications\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Mappings\" />
   </ItemGroup>
 
