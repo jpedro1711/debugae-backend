@@ -2,6 +2,7 @@
 using GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplicates;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.DownloadAttachment;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectsByProject;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetUserDefects;
@@ -26,6 +27,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapUpdateDefectStatus();
             group.MapAddCommentToDefect();
             group.MapGetDefectDetails();
+            group.MapDownloadDefectAttachment();
 
             return endpoints;
         }
@@ -161,6 +163,23 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (defectDetails is not null)
                     ? Results.Ok(defectDetails)
                     : Results.NotFound("Defect not found.");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapDownloadDefectAttachment(this RouteGroupBuilder group)
+        {
+            group.MapGet("/downloadAttachment", async (
+                [FromQuery] Guid defectId,
+                IMediator mediator) =>
+            {
+                var downloadAttachmentResponse = await mediator.Send(new DownloadAttachmentCommand(defectId));
+
+                return (downloadAttachmentResponse is not null)
+                    ? Results.File(downloadAttachmentResponse.Content, downloadAttachmentResponse.ContentType, downloadAttachmentResponse.FileName)
+                    : Results.NotFound("Defect has no attachments.");
 
             }).RequireAuthorization();
 
