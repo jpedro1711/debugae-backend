@@ -1,6 +1,7 @@
 ﻿using GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetUserProjects;
+using GestaoDefeitos.Application.UseCases.ProjectUseCases.ManageContributors;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapCreateProjectEndpoint(); 
             group.MapGetUserProjects();
             group.MapGetProjectDetails();
+            group.MapManageContributorstEndpoint();
 
             return endpoints;
         }
@@ -31,6 +33,23 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (projectId is not null)
                     ? Results.Created($"/projects/{projectId}", projectId)
                     : Results.BadRequest("Failed to create project.");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapManageContributorstEndpoint(this RouteGroupBuilder group)
+        {
+            group.MapPost("/manageContributors", async (
+                ManageContributorCommand command,
+                IMediator mediator) =>
+            {
+                var response = await mediator.Send(command);
+
+                return (response is not null)
+                    ? Results.Ok(response)
+                    : Results.BadRequest("Failed to manage contributors.");
 
             }).RequireAuthorization();
 
