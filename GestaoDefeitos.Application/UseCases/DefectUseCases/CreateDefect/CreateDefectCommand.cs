@@ -18,7 +18,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
         public required string ActualBehaviour { get; set; }
         public required string LogTrace { get; set; }
         public DefectPriority Priority { get; set; }
-        public List<string> DuplicatesIds { get; set; } = [];
+        public List<Guid> DuplicatesIds { get; set; } = [];
         public IFormFile? Attachment { get; set; }
     }
 }

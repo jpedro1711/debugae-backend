@@ -8,6 +8,5 @@ namespace GestaoDefeitos.Domain.Interfaces.Repositories
         Task<List<DefectsSimplifiedViewModel>> GetDefectsByProjectAsync(Guid projectId, CancellationToken cancellationToken);
         Task<List<DefectsSimplifiedViewModel>> GetDefectsByContributorAsync(Guid contributorId, CancellationToken cancellationToken);
         Task<List<DefectDuplicatesViewModel>> GetDefectsDuplicatedViewModelByProjectAsync(Guid projectId, CancellationToken cancellationToken);
-        Task<DefectAllDetailsViewModel?> GetDefectDetailsProjectionAsync(Guid defectId, CancellationToken cancellationToken);
     }
 }

@@ -78,9 +78,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
         {
             if (command.DuplicatesIds is null) return;
 
-            var duplicatesGuids = JsonConvert.DeserializeObject<List<Guid>>(command.DuplicatesIds[0])!;
-
-            foreach (var duplicateId in duplicatesGuids)
+            foreach (var duplicateId in command.DuplicatesIds)
             {
                 var duplicateDefect = await defectRepository.GetByIdAsync(duplicateId);
                 if (duplicateDefect != null)

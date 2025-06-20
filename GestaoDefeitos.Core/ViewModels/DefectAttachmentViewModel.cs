@@ -1,4 +1,4 @@
 ﻿namespace GestaoDefeitos.Domain.ViewModels
 {
-    public record DefectAttachmentViewModel(string? FileName , string? FileType, DateTime? UploadedAt, string UploadedBy);
+    public record DefectAttachmentViewModel(string? FileName , string? FileType, DateTime? UploadedAt, string? UploadedBy);
 }

@@ -47,6 +47,7 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
             builder.Services.AddScoped<ITagRepository, TagRepository>();
             builder.Services.AddScoped<IDefectRelationRepository, DefectRelationRepository>();
+            builder.Services.AddScoped<IDefectDetailsViewRepository, DefectDetailsViewRepository>();
 
             return builder;
         }

@@ -286,6 +286,7 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FileType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UploadByUsername = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FileContent = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)

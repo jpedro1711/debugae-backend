@@ -1,4 +1,4 @@
 ﻿namespace GestaoDefeitos.Domain.ViewModels
 {
-    public record DefectCommentViewModel(string ContributorName, string Comment, DateTime CreatedAt);
+    public record DefectCommentViewModel(string Author, string Content, DateTime CreatedAt);
 }

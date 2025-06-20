@@ -1,11 +1,13 @@
-﻿namespace GestaoDefeitos.Domain.ViewModels
+﻿using GestaoDefeitos.Domain.Enums;
+
+namespace GestaoDefeitos.Domain.ViewModels
 {
     public record DefectsSimplifiedViewModel(
-            string DefectId,
-            string DefectDescription,
-            string DefectSummary,
-            string DefectStatus,
-            string DefectPriority,
+            Guid Id,
+            string Description,
+            string Summary,
+            DefectStatus Status,
+            DefectPriority DefectPriority,
             DateTime CreatedAt
         );
 }

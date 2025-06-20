@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Domain.ViewModels;
@@ -8,37 +9,32 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
 {
     public class GetDefectDetailsHandler
         (
-            IDefectRepository defectRepository,
-            IDefectHistoryRepository defectHistoryRepository
+            IDefectDetailsViewRepository defectDetailsViewRepository
         ) : IRequestHandler<GetDefectDetailsQuery, GetDefectDetailsResponse?>
     {
         public async Task<GetDefectDetailsResponse?> Handle(GetDefectDetailsQuery query, CancellationToken cancellationToken)
         {
-            var defectDetails = await defectRepository.GetDefectDetailsProjectionAsync(query.DefectId, cancellationToken);
+            var defectDetails = await defectDetailsViewRepository.GetDefectDetails(query.DefectId, cancellationToken);
 
-            var changeHistory = await CreateDefectHistoryViewModel(
-                query.DefectId,
-                defectHistoryRepository,
-                cancellationToken
-            );
+            if (defectDetails == null)
+                return null;
 
-            return CreateDefectDetailsResponse(defectDetails, changeHistory);
+            return MapToDefectDetailsResponse(defectDetails);
         }
 
-        private async static Task<List<DefectHistoryViewModel>> CreateDefectHistoryViewModel(Guid defectId, IDefectHistoryRepository defectHistoryRepository, CancellationToken cancellationToken)
+        private static List<DefectHistoryViewModel> GetDefectHistoryViewModel(List<DefectHistoryWithValueViewModel> defectHistoryWithValues)
         {
-            var consolidatedHistory = new List<DefectHistoryViewModel>();
-            var defectHistories = await defectHistoryRepository.GetDefectHistoryByDefectIdAsync(defectId, cancellationToken);
+            List<DefectHistoryViewModel> consolidatedHistory = [];
 
-            foreach (var history in defectHistories)
+            foreach (var history in defectHistoryWithValues)
             {
                 if (history.Action == DefectAction.Create)
                     consolidatedHistory.Add(new DefectHistoryViewModel(
-                        DefectAction.Create.ToString(),
+                        DefectAction.Create,
                         null,
                         null,
                         null,
-                        history.Contributor.Id.ToString(),
+                        history.ContributorId,
                         history.CreatedAt
                     ));
                 else if (history.Action == DefectAction.Update)
@@ -49,11 +45,11 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
                     );
 
                     differences.Select(dif => new DefectHistoryViewModel(
-                        DefectAction.Update.ToString(),
+                        DefectAction.Update,
                         dif.Field,
                         dif.OldValue,
                         dif.NewValue,
-                        history.Contributor.Id.ToString(),
+                        history.ContributorId,
                         history.CreatedAt
                     )).ToList().ForEach(dif => consolidatedHistory.Add(dif));
                 }
@@ -62,26 +58,47 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
             return consolidatedHistory;
         }
 
-        private static GetDefectDetailsResponse? CreateDefectDetailsResponse(DefectAllDetailsViewModel? defect, List<DefectHistoryViewModel> changeHistory)
+        private static GetDefectDetailsResponse? MapToDefectDetailsResponse(DefectDetailsView? defectDetailsView)
         {
+            if (defectDetailsView is null)
+                return null;
 
             return new GetDefectDetailsResponse(
-                    defect?.DefectId,
-                    defect?.DefectDescription,
-                    defect?.DefectSummary,
-                    defect?.CreatedAt,
-                    defect?.CreatedByUser,
-                    defect?.DefectSeverity,
-                    defect?.DefectStatus,
-                    defect?.ExpirationDate,
-                    defect?.DefectCategory,
-                    defect?.ResponsibleContributor,
-                    defect?.Details,
-                    defect?.Comments,
-                    defect?.Attachment,
-                    defect?.RelatedDefects,
-                    changeHistory
+                    defectDetailsView.Id,
+                    defectDetailsView.Description,
+                    defectDetailsView.Summary,
+                    defectDetailsView.CreatedAt,
+                    defectDetailsView.CreatedBy,
+                    defectDetailsView.DefectSeverity,
+                    defectDetailsView.Status,
+                    defectDetailsView.ExpiresIn,
+                    defectDetailsView.DefectCategory,
+                    new DefectResponsibleContributorViewModel
+                    (
+                        defectDetailsView.AssignedTo,
+                        defectDetailsView.ContributorName
+                    ),
+                    new DefectDetailsViewModel
+                    (
+                        defectDetailsView.Description,
+                        defectDetailsView.DefectEnvironment,
+                        defectDetailsView.ActualBehaviour,
+                        defectDetailsView.ExpectedBehaviour,
+                        defectDetailsView.ProjectName,
+                        defectDetailsView.ContributorName
+                    ),
+                    defectDetailsView.Comments,
+                    new DefectAttachmentViewModel
+                    (
+                        defectDetailsView.AttachmentFileName,
+                        defectDetailsView.AttachmentFileType,
+                        defectDetailsView.AttachmentCreatedAt,
+                        defectDetailsView.UploadByUsername
+                    ),
+                    defectDetailsView.RelatedDefects,
+                    GetDefectHistoryViewModel(defectDetailsView.History)
                 );
         }
+
     }
 }

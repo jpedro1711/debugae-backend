@@ -51,11 +51,11 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
                         pc.Contributor.Firstname + " " + pc.Contributor.Lastname
                     )).ToList(),
                     project.Defects.Select(d => new DefectsSimplifiedViewModel(
-                        d.Id.ToString(),
+                        d.Id,
                         d.Description,
                         d.Summary,
-                        d.Status.ToString(),
-                        d.DefectPriority.ToString(),
+                        d.Status,
+                        d.DefectPriority,
                         d.CreatedAt
                     )).ToList()
                 );

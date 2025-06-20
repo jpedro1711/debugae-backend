@@ -30,6 +30,7 @@ namespace GestaoDefeitos.Infrastructure.Database
         public DbSet<DefectComment> DefectComments { get; set; }
         public DbSet<DefectAttachment> DefectAttachments { get; set; }
         public DbSet<DefectRelation> DefectRelations { get; set; }
+        public DbSet<DefectDetailsView> DefectDetailsView { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -39,6 +40,8 @@ namespace GestaoDefeitos.Infrastructure.Database
             builder.ApplyConfiguration(new DefectRelationConfiguration());
             builder.ApplyConfiguration(new DefectHistoryConfigurations());
             builder.ApplyConfiguration(new DefectCommentConfiguration());
+
+            builder.Entity<DefectDetailsView>().HasNoKey().ToView("vw_DefectDetails");
         }
     }
 }

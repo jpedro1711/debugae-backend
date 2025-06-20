@@ -13,6 +13,7 @@ COPY ["GestaoDefeitos.WebApi/GestaoDefeitos.WebApi.csproj", "GestaoDefeitos.WebA
 COPY ["GestaoDefeitos.Core/GestaoDefeitos.Domain.csproj", "GestaoDefeitos.Core/"]
 COPY ["GestaoDefeitos.Infrastructure/GestaoDefeitos.Infrastructure.csproj", "GestaoDefeitos.Infrastructure/"]
 COPY ["GestaoDefeitos.Application/GestaoDefeitos.Application.csproj", "GestaoDefeitos.Application/"]
+COPY ["GestaoDefeitos.Infrastructure/Scripts/", "GestaoDefeitos.Infrastructure/Scripts/"]
 RUN dotnet restore "./GestaoDefeitos.WebApi/GestaoDefeitos.WebApi.csproj"
 COPY . .
 WORKDIR "/src/GestaoDefeitos.WebApi"

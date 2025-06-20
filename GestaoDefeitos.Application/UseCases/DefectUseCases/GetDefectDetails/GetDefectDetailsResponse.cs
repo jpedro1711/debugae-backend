@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Domain.ViewModels;
+﻿using GestaoDefeitos.Domain.Enums;
+using GestaoDefeitos.Domain.ViewModels;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
 {
@@ -8,10 +9,10 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
             string? DefectSummary,
             DateTime? CreatedAt,
             string? CreatedByUser,
-            string? DefectSeverity,
-            string? DefectStatus,
+            DefectSeverity? DefectSeverity,
+            DefectStatus? DefectStatus,
             DateTime? ExpirationDate,
-            string? DefectCategory,
+            DefectCategory? DefectCategory,
             DefectResponsibleContributorViewModel? ResponsibleContributor,
             DefectDetailsViewModel? Details,
             List<DefectCommentViewModel>? Comments,
