@@ -57,5 +57,12 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                        ))
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<List<Defect>> GetDefectsDataByContributorIdAsync(Guid contributorId)
+        {
+            return await _context.Defects
+                .Where(d => d.AssignedToContributorId == contributorId)
+                .ToListAsync();
+        }
     }
 }
