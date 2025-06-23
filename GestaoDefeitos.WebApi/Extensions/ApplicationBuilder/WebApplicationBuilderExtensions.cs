@@ -27,6 +27,16 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             builder.Services.AddScoped<AuthenticationContextAcessor>();
             builder.Services.AddAuthorization();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
             return builder;
         }
 
@@ -100,6 +110,8 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             webApplication.ApplyMigrations();
 
             webApplication.UseHttpsRedirection();
+
+            webApplication.UseCors("AllowAll");
 
             webApplication.UseAuthorization();
 
