@@ -1,19 +1,18 @@
-﻿using GestaoDefeitos.Domain.Interfaces.Repositories;
+﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 
 namespace GestaoDefeitos.Application.UseCases.Notifications.GetCurrentLoggedUserNotifications
 {
     public class GetCurrentUserNotificationsHandler
         (
-            IHttpContextAccessor httpContextAccessor,
+            AuthenticationContextAcessor authenticationContextAcessor,
             IContributorNotificationRepository contributorNotificationRepository
         ) : IRequestHandler<GetCurrentLoggedUserNotificationsQuery, GetCurrentLoggedUserNotificationsResponse?>
     {
         public async Task<GetCurrentLoggedUserNotificationsResponse?> Handle(GetCurrentLoggedUserNotificationsQuery request, CancellationToken cancellationToken)
         {
-            var loggedUserId = Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
             var notifications = await contributorNotificationRepository.GetNotificationsByContributorIdAsync(loggedUserId);
 

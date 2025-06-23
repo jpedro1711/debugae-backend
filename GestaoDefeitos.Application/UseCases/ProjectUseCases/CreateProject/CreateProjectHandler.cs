@@ -1,9 +1,8 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 
 namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject
 {
@@ -11,7 +10,7 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject
         IProjectRepository projectRepository,
         IContributorRepository contributorRepository,
         IProjectContributorRepository projectContributorRepository,
-        IHttpContextAccessor httpContextAccessor
+        AuthenticationContextAcessor authenticationContextAcessor
         )
         : IRequestHandler<CreateProjectCommand, CreateProjectResponse?>
     {
@@ -30,7 +29,7 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject
 
             var createdProject = await projectRepository.AddAsync(project);
 
-            var loggedUserId = Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
             foreach (var contributorId in command.ContributorsIds)
             {

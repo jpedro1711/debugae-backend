@@ -1,19 +1,18 @@
-﻿using GestaoDefeitos.Domain.Enums;
+﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 
 namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
 {
     public class UserDefectsReportHandler(
             IDefectRepository defectRepository,
-            IHttpContextAccessor httpContextAccessor
+            AuthenticationContextAcessor authenticationContextAcessor
         ) : IRequestHandler<UserDefectsReportQuery, UserDefectsReportResponse?>
     {
         public async Task<UserDefectsReportResponse?> Handle(UserDefectsReportQuery request, CancellationToken cancellationToken)
         {
-            var loggedUserId = Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
             var defectsData = await defectRepository.GetDefectsDataByContributorIdAsync(loggedUserId);
 

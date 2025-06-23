@@ -1,10 +1,10 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System.Security.Claims;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 {
@@ -12,7 +12,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
         IDefectRepository defectRepository,
         IDefectAttachmentRepository defectAttachmentRepository,
         IDefectHistoryRepository defectHistoryRepository,
-        IHttpContextAccessor httpContextAccessor,
+        AuthenticationContextAcessor authenticationContextAcessor,
         IDefectRelationRepository defectRelationRepository,
         IProjectContributorRepository projectContributorRepository,
         IContributorNotificationRepository contributorNotificationRepository,
@@ -25,9 +25,9 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 
             newDefect.ExpiresIn = GetDefectExpirationDate(newDefect);
 
-            var loggedUserId = Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
-            var currentUserName = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+            var currentUserName = authenticationContextAcessor.GetCurrentLoggedUserName();
 
             await ValidateProjectAndUser(command, projectContributorRepository, projectRepository);
 

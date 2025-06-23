@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Application.Assembly;
+using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Infrastructure.Database;
@@ -22,7 +23,8 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             });
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddScoped<AuthenticationContextAcessor>();
             builder.Services.AddAuthorization();
 
             return builder;

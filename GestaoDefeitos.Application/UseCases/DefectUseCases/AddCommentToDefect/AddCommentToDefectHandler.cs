@@ -1,8 +1,7 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddCommentToDefect
 {
@@ -10,7 +9,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddCommentToDefect
         (
             IDefectRepository defectRepository,
             IDefectCommentRepository defectCommentRepository,
-            IHttpContextAccessor httpContextAccessor
+            AuthenticationContextAcessor authenticationContextAcessor
         ) : IRequestHandler<AddCommentToDefectCommand, AddCommentToDefectResponse?> 
     {
         public async Task<AddCommentToDefectResponse?> Handle(AddCommentToDefectCommand command, CancellationToken cancellationToken)
@@ -20,7 +19,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddCommentToDefect
             if (defect is null)
                 return null;
 
-            var loggedUserId = Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId(); ;
 
             var newComment = new DefectComment
             {

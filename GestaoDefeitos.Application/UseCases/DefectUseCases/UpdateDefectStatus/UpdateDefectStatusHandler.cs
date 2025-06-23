@@ -1,10 +1,9 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System.Security.Claims;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
 {
@@ -12,7 +11,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
         (
             IDefectRepository defectRepository, 
             IDefectHistoryRepository defectHistoryRepository,
-            IHttpContextAccessor httpContextAccessor,
+            AuthenticationContextAcessor authenticationContextAcessor,
             IContributorNotificationRepository contributorNotificationRepository
         ) : IRequestHandler<UpdateDefectStatusCommand, UpdateDefectStatusResponse?>
     {
@@ -23,7 +22,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
             if (defect == null)
                 return null;
 
-            var loggedUserId = Guid.Parse(httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
             var defectHistory = CreateDefectHistory(defect, loggedUserId);
 
