@@ -149,20 +149,12 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
                 ContributorId = contributorId,
                 Action = DefectAction.Create,
                 OldMetadataJson = string.Empty,
-                NewMetadataJson = Serialize(defect),
+                NewMetadataJson = Serializer.Serialize(defect),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null,
             };
 
             return await repository.AddAsync(history);
-        }
-
-        private static string Serialize(object data)
-        {
-            return JsonConvert.SerializeObject(data, new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            });
         }
 
         private static DateTime GetDefectExpirationDate(Defect defect)

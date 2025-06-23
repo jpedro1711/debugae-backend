@@ -33,7 +33,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
             if (updatedDefect is null)
                 return null;
 
-            defectHistory.NewMetadataJson = Serialize(updatedDefect);
+            defectHistory.NewMetadataJson = Serializer.Serialize(updatedDefect);
             await defectHistoryRepository.AddAsync(defectHistory);
 
             if (loggedUserId != defect.AssignedToContributorId)
@@ -50,18 +50,10 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
                 DefectId = defect.Id,
                 ContributorId = loggedUserId,
                 Action = DefectAction.Update,
-                OldMetadataJson = Serialize(defect),
+                OldMetadataJson = Serializer.Serialize(defect),
                 CreatedAt = defect.CreatedAt,
                 UpdatedAt = DateTime.UtcNow,
             };
-        }
-
-        private static string Serialize(object data)
-        {
-            return JsonConvert.SerializeObject(data, new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            });
         }
 
         private static async Task SaveUserNotification(Guid userId, IContributorNotificationRepository notificationRepository, Guid defectId)
