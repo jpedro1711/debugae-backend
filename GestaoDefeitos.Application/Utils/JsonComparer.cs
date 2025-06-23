@@ -6,8 +6,11 @@ namespace GestaoDefeitos.Application.Utils
 
     public static class JsonComparer
     {
-        public static List<(string Field, string? OldValue, string? NewValue)> CompareJson(string oldJson, string newJson)
+        public static List<(string Field, string? OldValue, string? NewValue)> CompareJson(string? oldJson, string? newJson)
         {
+            if (oldJson is null || newJson is null)
+                return [];
+
             var oldObj = JsonConvert.DeserializeObject<JObject>(oldJson);
             var newObj = JsonConvert.DeserializeObject<JObject>(newJson);
 

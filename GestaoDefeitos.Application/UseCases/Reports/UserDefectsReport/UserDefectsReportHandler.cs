@@ -1,6 +1,7 @@
 ﻿using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
+using GestaoDefeitos.Domain.ViewModels.DefectsReport;
 using MediatR;
 
 namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
@@ -16,7 +17,7 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
 
             var defectsData = await defectRepository.GetDefectsDataByContributorIdAsync(loggedUserId);
 
-            var metrics = new MetricsDto
+            var metrics = new DefectMetricsViewModel
             {
                 Total = defectsData.Count,
                 HighPriority = defectsData.Count(d => d.DefectPriority == DefectPriority.P5),
@@ -27,7 +28,7 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
 
             var statusData = Enum.GetValues(typeof(DefectStatus))
                 .Cast<DefectStatus>()
-                .Select(status => new StatusDataDto
+                .Select(status => new DefectByStatusViewModel
                 {
                     Name = status.ToString(), 
                     Value = defectsData.Count(d => d.Status == status)
@@ -36,7 +37,7 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
 
             var severityData = Enum.GetValues(typeof(DefectSeverity))
                 .Cast<DefectSeverity>()
-                .Select(severity => new SeverityDataDto
+                .Select(severity => new DefectBySeverityViewModel
                 {
                     Name = severity.ToString(),
                     Value = defectsData.Count(d => d.DefectSeverity == severity)
@@ -45,7 +46,7 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
 
             var categoryData = Enum.GetValues(typeof(DefectCategory))
                 .Cast<DefectCategory>()
-                .Select(category => new CategoryDataDto
+                .Select(category => new DefectByCategoryViewModel
                 {
                     Category = category.ToString(),
                     Count = defectsData.Count(d => d.DefectCategory == category)
@@ -63,7 +64,7 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
             var timelineData = last7Days
                 .Select(date => new {
                     date,
-                    bugs = groupedByDate.ContainsKey(date) ? groupedByDate[date] : 0
+                    defects = groupedByDate.TryGetValue(date, out var count) ? count : 0
                 })
                 .ToList();
 
@@ -73,10 +74,10 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
                 StatusData = statusData,
                 SeverityData = severityData,
                 CategoryData = categoryData,
-                TimelineData = timelineData.Select(td => new TimelineDataDto
+                TimelineData = timelineData.Select(td => new DefectsTimeLineDataViewModel
                 {
                     Date = td.date,
-                    Bugs = td.bugs
+                    Defects = td.defects
                 }).ToList()
             };
         }
