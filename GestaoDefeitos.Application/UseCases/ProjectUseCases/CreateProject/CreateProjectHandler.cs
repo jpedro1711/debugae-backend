@@ -16,11 +16,6 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject
     {
         public async Task<CreateProjectResponse?> Handle(CreateProjectCommand command, CancellationToken cancellationToken)
         {
-            var contributors = await contributorRepository.GetContributorsByIdsAsync(command.ContributorsIds);
-
-            if (contributors.Count != command.ContributorsIds.Count)
-                return null;
-
             var project = new Project
             {
                 Name = command.ProjectName,
@@ -31,16 +26,16 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject
 
             var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
-            foreach (var contributorId in command.ContributorsIds)
+            foreach (var contributorEmail in command.ContributorsEmails)
             {
-                var contributor = contributors.FirstOrDefault(c => c.Id == new Guid(contributorId));
+                var contributor = await contributorRepository.GetContributorByEmailAsync(contributorEmail);
                 if (contributor != null)
                 {
                     var projectContributor = new ProjectContributor
                     {
                         ProjectId = createdProject.Id,
                         ContributorId = contributor.Id,
-                        Role = (new Guid(contributorId) == loggedUserId) ? ProjectRole.Administrator : ProjectRole.Contributor,
+                        Role = (contributor.Id == loggedUserId) ? ProjectRole.Administrator : ProjectRole.Contributor,
                     };
 
                     await projectContributorRepository.AddAsync(projectContributor);

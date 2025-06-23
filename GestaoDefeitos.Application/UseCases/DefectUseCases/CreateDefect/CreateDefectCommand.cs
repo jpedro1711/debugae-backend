@@ -7,7 +7,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
     public record CreateDefectCommand : IRequest<CreateDefectResponse?>
     {
         public required string ProjectId { get; set; }
-        public required string AssignedToUserId { get; set; }
+        public required string AssignedToUserEmail { get; set; }
         public required string Summary { get; set; }
         public required string Description { get; set; }
         public DefectEnvironment Environment { get; set; }

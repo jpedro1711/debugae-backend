@@ -13,7 +13,7 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetUserProjects
         {
             var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
-            return new GetUserProjectsResponse(await projectContributorRepository.GetProjectContributorsByUserIdAsync(loggedUserId));
+            return new GetUserProjectsResponse(await projectContributorRepository.GetProjectContributorsByUserIdAsync(loggedUserId, query.Page, query.PageSize));
         }
     }
 }

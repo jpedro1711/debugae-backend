@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.Entities.Base.GestaoDefeitos.Domain.Pagination;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Domain.ViewModels;
 using GestaoDefeitos.Infrastructure.Database;
@@ -64,5 +65,56 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 .Where(d => d.AssignedToContributorId == contributorId)
                 .ToListAsync();
         }
+
+        public async Task<PagedResult<DefectsSimplifiedViewModel>> GetDefectsByProjectPagedAsync(
+            Guid projectId, int page, int pageSize, CancellationToken cancellationToken)
+        {
+            var query = _context.Defects
+                .Where(d => d.ProjectId == projectId);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .OrderByDescending(d => d.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(d => new DefectsSimplifiedViewModel(
+                    d.Id,
+                    d.Description,
+                    d.Summary,
+                    d.Status.ToString(),
+                    d.DefectPriority.ToString(),
+                    d.CreatedAt
+                ))
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<DefectsSimplifiedViewModel>(items, totalCount, page, pageSize);
+        }
+
+        public async Task<PagedResult<DefectsSimplifiedViewModel>> GetDefectsByContributorPagedAsync(
+            Guid contributorId, int page, int pageSize, CancellationToken cancellationToken)
+        {
+            var query = _context.Defects
+                .Where(d => d.AssignedToContributorId == contributorId);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .OrderByDescending(d => d.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(d => new DefectsSimplifiedViewModel(
+                    d.Id,
+                    d.Description,
+                    d.Summary,
+                    d.Status.ToString(),
+                    d.DefectPriority.ToString(),
+                    d.CreatedAt
+                ))
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<DefectsSimplifiedViewModel>(items, totalCount, page, pageSize);
+        }
+
     }
 }

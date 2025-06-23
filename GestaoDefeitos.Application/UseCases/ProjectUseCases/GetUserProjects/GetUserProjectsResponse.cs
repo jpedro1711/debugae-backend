@@ -1,6 +1,7 @@
-﻿using GestaoDefeitos.Domain.ViewModels;
+﻿using GestaoDefeitos.Domain.Entities.Base.GestaoDefeitos.Domain.Pagination;
+using GestaoDefeitos.Domain.ViewModels;
 
 namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetUserProjects
 {
-    public record GetUserProjectsResponse(List<UsersProjectViewModel> UserProjects);
+    public record GetUserProjectsResponse(PagedResult<UsersProjectViewModel> Data);
 }

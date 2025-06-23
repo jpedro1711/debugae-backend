@@ -16,7 +16,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
         IDefectRelationRepository defectRelationRepository,
         IProjectContributorRepository projectContributorRepository,
         IContributorNotificationRepository contributorNotificationRepository,
-        IProjectRepository projectRepository
+        IProjectRepository projectRepository,
+        IContributorRepository contributorRepository
         ) : IRequestHandler<CreateDefectCommand, CreateDefectResponse?>
     {
         public async Task<CreateDefectResponse?> Handle(CreateDefectCommand command, CancellationToken cancellationToken)
@@ -25,11 +26,15 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 
             newDefect.ExpiresIn = GetDefectExpirationDate(newDefect);
 
+            var assignedUser = await contributorRepository.GetContributorByEmailAsync(command.AssignedToUserEmail) ?? throw new InvalidOperationException("The user assigned to the defect does not exist.");
+
+            newDefect.AssignedToContributorId = assignedUser.Id;
+
             var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
             var currentUserName = authenticationContextAcessor.GetCurrentLoggedUserName();
 
-            await ValidateProjectAndUser(command, projectContributorRepository, projectRepository);
+            await ValidateProjectAndUser(command, projectContributorRepository, projectRepository, assignedUser);
 
             var savedDefect = await defectRepository.AddAsync(newDefect);
 
@@ -37,8 +42,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
                 await SaveDefectAttachment(command.Attachment, defectAttachmentRepository, newDefect, currentUserName ?? "Unknown user");
 
             // Someone if assigned the defect to other user, so we have to notify the assigned user
-            if (new Guid(command.AssignedToUserId) != loggedUserId)
-                await SaveUserNotification(new Guid(command.AssignedToUserId), contributorNotificationRepository, newDefect.Id);
+            if (assignedUser.Id != loggedUserId)
+                await SaveUserNotification(assignedUser.Id, contributorNotificationRepository, newDefect.Id);
 
             await CreateDefectHistory(newDefect, defectHistoryRepository, loggedUserId);
 
@@ -47,14 +52,14 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             return new CreateDefectResponse(savedDefect.Id.ToString());
         }
 
-        private static async Task ValidateProjectAndUser(CreateDefectCommand command, IProjectContributorRepository projectContributorRepository, IProjectRepository projectRepository)
+        private static async Task ValidateProjectAndUser(CreateDefectCommand command, IProjectContributorRepository projectContributorRepository, IProjectRepository projectRepository, Contributor assignedUser)
         {
             var projectExists = await projectRepository.GetByIdAsync(new Guid(command.ProjectId)) is not null;
 
             if (!projectExists)
                 throw new InvalidOperationException("The project does not exist.");
 
-            var isAssignedUserInProject = await projectContributorRepository.IsUserOnProject(new Guid(command.AssignedToUserId), new Guid(command.ProjectId));
+            var isAssignedUserInProject = await projectContributorRepository.IsUserOnProject(assignedUser.Id, new Guid(command.ProjectId));
 
             if (!isAssignedUserInProject)
                 throw new InvalidOperationException("The user assigned to the defect is not part of the project.");
@@ -96,7 +101,6 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             {
                 Id = Guid.NewGuid(),
                 ProjectId = new Guid(command.ProjectId),
-                AssignedToContributorId = new Guid(command.AssignedToUserId),
                 Summary = command.Summary,
                 Description = command.Description,
                 DefectEnvironment = command.Environment,

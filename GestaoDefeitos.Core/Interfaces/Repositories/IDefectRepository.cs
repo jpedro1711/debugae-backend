@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.Entities.Base.GestaoDefeitos.Domain.Pagination;
 using GestaoDefeitos.Domain.ViewModels;
 
 namespace GestaoDefeitos.Domain.Interfaces.Repositories
@@ -9,5 +10,9 @@ namespace GestaoDefeitos.Domain.Interfaces.Repositories
         Task<List<DefectsSimplifiedViewModel>> GetDefectsByContributorAsync(Guid contributorId, CancellationToken cancellationToken);
         Task<List<DefectDuplicatesViewModel>> GetDefectsDuplicatedViewModelByProjectAsync(Guid projectId, CancellationToken cancellationToken);
         Task<List<Defect>> GetDefectsDataByContributorIdAsync(Guid contributorId);
+        Task<PagedResult<DefectsSimplifiedViewModel>> GetDefectsByContributorPagedAsync(
+            Guid contributorId, int page, int pageSize, CancellationToken cancellationToken);
+        Task<PagedResult<DefectsSimplifiedViewModel>> GetDefectsByProjectPagedAsync(
+            Guid projectId, int page, int pageSize, CancellationToken cancellationToken);
     }
 }

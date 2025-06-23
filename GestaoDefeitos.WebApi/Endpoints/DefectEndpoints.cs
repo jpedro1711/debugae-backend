@@ -53,10 +53,13 @@ namespace GestaoDefeitos.WebApi.Endpoints
         public static RouteGroupBuilder MapGetProjectDefects(this RouteGroupBuilder group)
         {
             group.MapGet("/getProjectDefects", async (
-                [FromQuery] Guid projectId,
-                IMediator mediator) =>
+                    [FromQuery] Guid projectId,
+                    IMediator mediator,
+                    [FromQuery] int page = 1,
+                    [FromQuery] int pageSize = 10
+                ) =>
             {
-                GetDefectsByProjectQuery query = new(projectId);
+                GetDefectsByProjectQuery query = new(projectId, page, pageSize);
                 var defects = await mediator.Send(query);
 
                 return (defects is not null)
@@ -71,9 +74,12 @@ namespace GestaoDefeitos.WebApi.Endpoints
         public static RouteGroupBuilder MapGetUserDefects(this RouteGroupBuilder group)
         {
             group.MapGet("/getCurrentUserDefects", async (
-                IMediator mediator) =>
+                    IMediator mediator,
+                    [FromQuery] int page = 1,
+                    [FromQuery] int pageSize = 10
+                ) =>
             {
-                var userDefects = await mediator.Send(new GetUserDefectsQuery());
+                var userDefects = await mediator.Send(new GetUserDefectsQuery(page, pageSize));
                 
                 return (userDefects is not null)
                     ? Results.Ok(userDefects)

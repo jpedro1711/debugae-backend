@@ -9,8 +9,10 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectsByProject
     {
         public async Task<GetDefectsByProjectResponse> Handle(GetDefectsByProjectQuery request, CancellationToken cancellationToken)
         {
-            var defects = await defectRepository.GetDefectsByProjectAsync(request.ProjectId, cancellationToken);
-            return new GetDefectsByProjectResponse(defects);
+            var pagedDefects = await defectRepository.GetDefectsByProjectPagedAsync(
+            request.ProjectId, request.Page, request.PageSize, cancellationToken);
+
+            return new GetDefectsByProjectResponse(pagedDefects);
         }
     }
 }

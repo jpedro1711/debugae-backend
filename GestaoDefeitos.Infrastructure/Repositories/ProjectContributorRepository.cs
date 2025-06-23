@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.Entities.Base.GestaoDefeitos.Domain.Pagination;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Domain.ViewModels;
 using GestaoDefeitos.Infrastructure.Database;
@@ -10,11 +11,18 @@ namespace GestaoDefeitos.Infrastructure.Repositories
         : BaseRepository<ProjectContributor>(context), 
           IProjectContributorRepository
     {
-        public async Task<List<UsersProjectViewModel>> GetProjectContributorsByUserIdAsync(Guid userId)
+        public async Task<PagedResult<UsersProjectViewModel>> GetProjectContributorsByUserIdAsync(Guid userId, int page, int pageSize)
         {
-            return await _context.ProjectContributors
+            var query = _context.ProjectContributors
                 .Where(pc => pc.ContributorId == userId)
-                .Include(pc => pc.Project)
+                .Include(pc => pc.Project);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(pc => pc.Project.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(pc => new UsersProjectViewModel
                 (
                     pc.Project.Id.ToString(),
@@ -24,6 +32,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     pc.Role.ToString()
                 ))
                 .ToListAsync();
+
+            return new PagedResult<UsersProjectViewModel>(items, totalCount, page, pageSize);
         }
 
         public async Task<bool> IsUserOnProject(Guid userId, Guid projectId)

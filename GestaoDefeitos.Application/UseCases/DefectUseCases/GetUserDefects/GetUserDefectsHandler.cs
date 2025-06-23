@@ -12,7 +12,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetUserDefects
         public async Task<GetUserDefectsResponse> Handle(GetUserDefectsQuery request, CancellationToken cancellationToken)
         {
             var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
-            var userDefects = await defectRepository.GetDefectsByContributorAsync(loggedUserId, cancellationToken);
+            var userDefects = await defectRepository.GetDefectsByContributorPagedAsync(loggedUserId, request.Page, request.PageSize, cancellationToken);
 
             return new GetUserDefectsResponse(userDefects);
         }

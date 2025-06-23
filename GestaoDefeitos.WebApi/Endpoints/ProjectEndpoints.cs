@@ -58,10 +58,13 @@ namespace GestaoDefeitos.WebApi.Endpoints
 
         public static RouteGroupBuilder MapGetUserProjects(this RouteGroupBuilder group)
         {
-            group.MapPost("/getCurrentUserProjects", async (
-                IMediator mediator) =>
+            group.MapGet("/getCurrentUserProjects", async (
+                    IMediator mediator,
+                    [FromQuery] int page = 1,
+                    [FromQuery] int pageSize = 10
+                ) =>
             {
-                var userProjects = await mediator.Send(new GetUserProjectsQuery());
+                var userProjects = await mediator.Send(new GetUserProjectsQuery(page, pageSize));
 
                 return (userProjects is not null)
                     ? Results.Ok(userProjects)
