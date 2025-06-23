@@ -30,7 +30,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
             {
                 if (history.Action == DefectAction.Create)
                     consolidatedHistory.Add(new DefectHistoryViewModel(
-                        DefectAction.Create,
+                        DefectAction.Create.ToString(),
                         null,
                         null,
                         null,
@@ -45,7 +45,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
                     );
 
                     differences.Select(dif => new DefectHistoryViewModel(
-                        DefectAction.Update,
+                        DefectAction.Update.ToString(),
                         dif.Field,
                         dif.OldValue,
                         dif.NewValue,
@@ -81,7 +81,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
                     new DefectDetailsViewModel
                     (
                         defectDetailsView.Description,
-                        defectDetailsView.DefectEnvironment,
+                        defectDetailsView.DefectEnvironment.ToString(),
                         defectDetailsView.ActualBehaviour,
                         defectDetailsView.ExpectedBehaviour,
                         defectDetailsView.ProjectName,

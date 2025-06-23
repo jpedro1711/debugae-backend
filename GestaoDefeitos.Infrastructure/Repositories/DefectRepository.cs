@@ -17,8 +17,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         d.Id,
                         d.Description,
                         d.Summary,
-                        d.Status,
-                        d.DefectPriority,
+                        d.Status.ToString(),
+                        d.DefectPriority.ToString(),
                         d.CreatedAt
                        ))
                 .ToListAsync(cancellationToken);
@@ -35,9 +35,9 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     AssignedToUserId = d.AssignedToContributorId.ToString(),
                     Summary = d.Summary,
                     Description = d.Description,
-                    Category = d.DefectCategory,
-                    Severity = d.DefectSeverity,
-                    Environment = d.DefectEnvironment,
+                    Category = d.DefectCategory.ToString(),
+                    Severity = d.DefectSeverity.ToString(),
+                    Environment = d.DefectEnvironment.ToString(),
                     Version = d.Version
                 })
                 .ToListAsync(cancellationToken);
@@ -51,8 +51,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         d.Id,
                         d.Description,
                         d.Summary,
-                        d.Status,
-                        d.DefectPriority,
+                        d.Status.ToString(),
+                        d.DefectPriority.ToString(),
                         d.CreatedAt
                        ))
                 .ToListAsync(cancellationToken);

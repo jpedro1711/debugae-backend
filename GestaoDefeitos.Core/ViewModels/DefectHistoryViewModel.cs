@@ -3,7 +3,7 @@
 namespace GestaoDefeitos.Domain.ViewModels
 {
     public record DefectHistoryViewModel(
-        DefectAction Action, 
+        string Action, 
         string? UpdatedField, 
         string? OldValue, 
         string? NewValue, 

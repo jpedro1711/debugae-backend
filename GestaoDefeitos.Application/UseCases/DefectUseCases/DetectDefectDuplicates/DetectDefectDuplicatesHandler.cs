@@ -18,9 +18,9 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplica
                 AssignedToUserId = command.AssignedToUserId,
                 Summary = command.Summary,
                 Description = command.Description,
-                Category = command.Category,
-                Severity = command.Severity,
-                Environment = command.Environment,
+                Category = command.Category.ToString(),
+                Severity = command.Severity.ToString(),
+                Environment = command.Environment.ToString(),
                 Version = command.Version
             };
 

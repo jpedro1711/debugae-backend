@@ -1,9 +1,14 @@
-﻿namespace GestaoDefeitos.Domain.Enums
+﻿using System.ComponentModel;
+
+namespace GestaoDefeitos.Domain.Enums
 {
     public enum DefectEnvironment
     {
+        [Description("Development")]
         Development = 1,
-        Staging = 3,
-        Production = 4
+        [Description("Testing")]
+        Staging = 2,
+        [Description("Production")]
+        Production = 3
     }
 }

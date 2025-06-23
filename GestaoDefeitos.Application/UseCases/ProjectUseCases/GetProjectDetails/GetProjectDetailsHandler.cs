@@ -54,8 +54,8 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
                         d.Id,
                         d.Description,
                         d.Summary,
-                        d.Status,
-                        d.DefectPriority,
+                        d.Status.ToString(),
+                        d.DefectPriority.ToString(),
                         d.CreatedAt
                     )).ToList()
                 );

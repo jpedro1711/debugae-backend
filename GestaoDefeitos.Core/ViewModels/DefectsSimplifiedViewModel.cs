@@ -6,8 +6,8 @@ namespace GestaoDefeitos.Domain.ViewModels
             Guid Id,
             string Description,
             string Summary,
-            DefectStatus Status,
-            DefectPriority DefectPriority,
+            string Status,
+            string DefectPriority,
             DateTime CreatedAt
         );
 }

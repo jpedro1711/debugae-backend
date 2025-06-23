@@ -2,5 +2,5 @@
 
 namespace GestaoDefeitos.Domain.ViewModels
 {
-    public record DefectDetailsViewModel(string? DefectDescription, DefectEnvironment? DefectEnvironment, string? ActualBehaviour, string? ExpectedBehaviour, string? ProjectName, string? ResponsibleName);
+    public record DefectDetailsViewModel(string? DefectDescription, string DefectEnvironment, string? ActualBehaviour, string? ExpectedBehaviour, string? ProjectName, string? ResponsibleName);
 }
