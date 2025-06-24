@@ -63,6 +63,7 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             builder.Services.AddScoped<ITagRepository, TagRepository>();
             builder.Services.AddScoped<IDefectRelationRepository, DefectRelationRepository>();
             builder.Services.AddScoped<IDefectDetailsViewRepository, DefectDetailsViewRepository>();
+            builder.Services.AddScoped<ITrelloUserStoryRepository, TrelloUserStoryRepository>();
 
             builder.Services.AddScoped<ITrelloIntegrationService, TrelloIntegrationService>();
             builder.Services.AddScoped<ITrelloRequestTokenCache, TrelloRequestTokenCach>();

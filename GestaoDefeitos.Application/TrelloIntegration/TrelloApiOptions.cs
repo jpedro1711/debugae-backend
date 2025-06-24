@@ -12,5 +12,6 @@
         public string OAuthAuthorizeTokenUrl { get; set; } = string.Empty;
         public string OAuthGetRequestTokenUrl { get; set; } = string.Empty;
         public string OAuthGetAccessTokenUrl { get; set; } = string.Empty;
+        public string GetCardUrl { get; set; } = string.Empty;
     }
 }

@@ -5,7 +5,7 @@
         Task<string> GetWorkspacesAsync(string userId);
         Task<string> GetBoardsAsync(string userId, string workspaceId);
         Task<string> GetCardsAsync(string userId, string boardId);
-        Task<string> AddCommentAsync(string userId, string cardId, string comment);
+        Task<string> AddCommentAsync(string userId, string cardId, string comment, Guid defectId);
         void StoreAccessToken(string userId, string token, string tokenSecret);
         bool TryGetAccessToken(string userId, out (string token, string tokenSecret) tokenData);
         Task<string> GetLoginRedirectUrlAsync();

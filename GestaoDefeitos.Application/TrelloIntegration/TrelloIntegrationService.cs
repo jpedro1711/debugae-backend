@@ -1,13 +1,17 @@
-﻿using GestaoDefeitos.WebApi.Cache;
-using OAuth;
+﻿using GestaoDefeitos.Application.TrelloIntegration.Responses;
+using GestaoDefeitos.Domain.Interfaces.Repositories;
+using GestaoDefeitos.WebApi.Cache;
 using Microsoft.Extensions.Options;
+using OAuth;
+using System.Text.Json;
 
 namespace GestaoDefeitos.Application.TrelloIntegration
 {
     public class TrelloIntegrationService
         (
             ITrelloRequestTokenCache cache,
-            IOptions<TrelloApiOptions> options
+            IOptions<TrelloApiOptions> options,
+            ITrelloUserStoryRepository _trelloUserStoryRepository
         ) : ITrelloIntegrationService
     {
         private readonly ITrelloRequestTokenCache _cache = cache;
@@ -51,77 +55,100 @@ namespace GestaoDefeitos.Application.TrelloIntegration
             return await TrelloGetAsync(url, token, secret);
         }
 
-        public async Task<string> AddCommentAsync(string userId, string cardId, string comment)
+        public async Task<string> GetCardDetailsAsync(string userId, string cardId)
+        {
+            var (token, secret) = EnsureToken(userId);
+            var url = string.Format(_options.GetCardUrl, cardId);
+            return await TrelloGetAsync(url, token, secret);
+        }
+
+        public async Task<string> AddCommentAsync(string userId, string cardId, string comment, Guid defectId)
         {
             var (token, secret) = EnsureToken(userId);
             var url = string.Format(_options.AddCommentUrl, cardId, Uri.EscapeDataString(comment));
-            return await TrelloPostAsync(url, token, secret);
+            var createdComment =  await TrelloPostAsync(url, token, secret);
+
+            var cardDetails = await GetCardDetailsAsync(userId, cardId);
+
+            var trelloUserStoryViewModel = JsonSerializer.Deserialize<TrelloUserStoryViewModel>(cardDetails);
+
+            TrelloUserStory trelloUserStory = new TrelloUserStory
+            {
+                Id = Guid.NewGuid(),
+                Desc = trelloUserStoryViewModel?.Description,
+                ShortUrl = trelloUserStoryViewModel?.Url,
+                DefectId = defectId
+            };
+
+            await _trelloUserStoryRepository.AddAsync(trelloUserStory);
+
+            return createdComment;
         }
 
         public async Task<string> GetLoginRedirectUrlAsync()
-{
-    var oauth = new OAuthRequest
-    {
-        Method = "GET",
-        RequestUrl = _options.OAuthGetRequestTokenUrl,
-        ConsumerKey = _options.ConsumerKey,
-        ConsumerSecret = _options.ConsumerSecret,
-        CallbackUrl = _options.CallbackUrl
-    };
+        {
+            var oauth = new OAuthRequest
+            {
+                Method = "GET",
+                RequestUrl = _options.OAuthGetRequestTokenUrl,
+                ConsumerKey = _options.ConsumerKey,
+                ConsumerSecret = _options.ConsumerSecret,
+                CallbackUrl = _options.CallbackUrl
+            };
 
-    using var client = new HttpClient();
-    var request = new HttpRequestMessage(HttpMethod.Get, oauth.RequestUrl);
-    request.Headers.Add("Authorization", oauth.GetAuthorizationHeader());
+            using var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Get, oauth.RequestUrl);
+            request.Headers.Add("Authorization", oauth.GetAuthorizationHeader());
 
-    var response = await client.SendAsync(request);
-    var responseText = await response.Content.ReadAsStringAsync();
+            var response = await client.SendAsync(request);
+            var responseText = await response.Content.ReadAsStringAsync();
 
-    var query = System.Web.HttpUtility.ParseQueryString(responseText);
-    var token = query["oauth_token"];
-    var tokenSecret = query["oauth_token_secret"];
+            var query = System.Web.HttpUtility.ParseQueryString(responseText);
+            var token = query["oauth_token"];
+            var tokenSecret = query["oauth_token_secret"];
 
-    _cache.StoreRequestToken(token!, tokenSecret!);
+            _cache.StoreRequestToken(token!, tokenSecret!);
 
-    var authorizeUrl = $"{_options.OAuthAuthorizeTokenUrl}?oauth_token={token}&name=DefectManager&scope=read,write&expiration=never";
-    return authorizeUrl;
-}
+            var authorizeUrl = $"{_options.OAuthAuthorizeTokenUrl}?oauth_token={token}&name=DefectManager&scope=read,write&expiration=never";
+            return authorizeUrl;
+        }
 
-public async Task<bool> HandleCallbackAsync(string oauth_token, string oauth_verifier, string userId)
-{
-    var tokenSecret = _cache.GetRequestTokenSecret(oauth_token);
+        public async Task<bool> HandleCallbackAsync(string oauth_token, string oauth_verifier, string userId)
+        {
+            var tokenSecret = _cache.GetRequestTokenSecret(oauth_token);
 
-    if (tokenSecret is null)
-        return false;
+            if (tokenSecret is null)
+                return false;
 
-    var oauth = new OAuthRequest
-    {
-        Method = "GET",
-        RequestUrl = _options.OAuthGetAccessTokenUrl,
-        ConsumerKey = _options.ConsumerKey,
-        ConsumerSecret = _options.ConsumerSecret,
-        Token = oauth_token,
-        TokenSecret = tokenSecret,
-        Verifier = oauth_verifier
-    };
+            var oauth = new OAuthRequest
+            {
+                Method = "GET",
+                RequestUrl = _options.OAuthGetAccessTokenUrl,
+                ConsumerKey = _options.ConsumerKey,
+                ConsumerSecret = _options.ConsumerSecret,
+                Token = oauth_token,
+                TokenSecret = tokenSecret,
+                Verifier = oauth_verifier
+            };
 
-    using var client = new HttpClient();
-    var request = new HttpRequestMessage(HttpMethod.Get, oauth.RequestUrl);
-    request.Headers.Add("Authorization", oauth.GetAuthorizationHeader());
+            using var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Get, oauth.RequestUrl);
+            request.Headers.Add("Authorization", oauth.GetAuthorizationHeader());
 
-    var response = await client.SendAsync(request);
-    var responseText = await response.Content.ReadAsStringAsync();
-    var query = System.Web.HttpUtility.ParseQueryString(responseText);
+            var response = await client.SendAsync(request);
+            var responseText = await response.Content.ReadAsStringAsync();
+            var query = System.Web.HttpUtility.ParseQueryString(responseText);
 
-    var accessToken = query["oauth_token"];
-    var accessTokenSecret = query["oauth_token_secret"];
+            var accessToken = query["oauth_token"];
+            var accessTokenSecret = query["oauth_token_secret"];
 
-    if (accessToken == null || accessTokenSecret == null)
-        return false;
+            if (accessToken == null || accessTokenSecret == null)
+                return false;
 
-    _cache.StoreAccessToken(userId, accessToken, accessTokenSecret);
+            _cache.StoreAccessToken(userId, accessToken, accessTokenSecret);
 
-    return true;
-}
+            return true;
+        }
 
 
         private (string token, string tokenSecret) EnsureToken(string userId)

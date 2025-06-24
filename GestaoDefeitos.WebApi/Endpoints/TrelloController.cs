@@ -44,9 +44,9 @@ public class TrelloController(AuthenticationContextAcessor _authenticationContex
         return await _trelloIntegrationService.GetCardsAsync(_authenticationContextAcessor.GetCurrentLoggedUserId().ToString(), boardId);
     }
 
-    [HttpPost("cards/{cardId}/comments")]
-    public async Task<string> AddComment(string cardId, [FromBody] string comment)
+    [HttpPost("cards/{cardId}/defects/{defectId}/comments")]
+    public async Task<string> AddComment(string cardId, Guid defectId, [FromBody] string comment)
     {
-        return await _trelloIntegrationService.AddCommentAsync(_authenticationContextAcessor.GetCurrentLoggedUserId().ToString(), cardId, comment);
+        return await _trelloIntegrationService.AddCommentAsync(_authenticationContextAcessor.GetCurrentLoggedUserId().ToString(), cardId, comment, defectId);
     }
 }

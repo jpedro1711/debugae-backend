@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Application.Utils;
+﻿using GestaoDefeitos.Application.TrelloIntegration;
+using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
@@ -9,17 +10,20 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
 {
     public class GetDefectDetailsHandler
         (
-            IDefectDetailsViewRepository defectDetailsViewRepository
+            IDefectDetailsViewRepository defectDetailsViewRepository,
+            ITrelloUserStoryRepository trelloUserStoryRepository
         ) : IRequestHandler<GetDefectDetailsQuery, GetDefectDetailsResponse?>
     {
         public async Task<GetDefectDetailsResponse?> Handle(GetDefectDetailsQuery query, CancellationToken cancellationToken)
         {
             var defectDetails = await defectDetailsViewRepository.GetDefectDetails(query.DefectId, cancellationToken);
 
+            var userStories = await trelloUserStoryRepository.GetUserStoriesByDefectId(query.DefectId);
+
             if (defectDetails == null)
                 return null;
 
-            return MapToDefectDetailsResponse(defectDetails);
+            return MapToDefectDetailsResponse(defectDetails, userStories);
         }
 
         private static List<DefectHistoryViewModel> GetDefectHistoryViewModel(List<DefectHistoryWithValueViewModel> defectHistoryWithValues)
@@ -58,7 +62,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
             return consolidatedHistory;
         }
 
-        private static GetDefectDetailsResponse? MapToDefectDetailsResponse(DefectDetailsView? defectDetailsView)
+        private static GetDefectDetailsResponse? MapToDefectDetailsResponse(DefectDetailsView? defectDetailsView, List<TrelloUserStory?> trelloUserStories)
         {
             if (defectDetailsView is null)
                 return null;
@@ -96,7 +100,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
                         defectDetailsView.UploadByUsername
                     ),
                     defectDetailsView.RelatedDefects,
-                    GetDefectHistoryViewModel(defectDetailsView.History)
+                    GetDefectHistoryViewModel(defectDetailsView.History),
+                    trelloUserStories
                 );
         }
 

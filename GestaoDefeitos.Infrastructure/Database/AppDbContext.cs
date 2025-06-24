@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.TrelloIntegration;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Identity;
 using GestaoDefeitos.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -31,6 +32,7 @@ namespace GestaoDefeitos.Infrastructure.Database
         public DbSet<DefectAttachment> DefectAttachments { get; set; }
         public DbSet<DefectRelation> DefectRelations { get; set; }
         public DbSet<DefectDetailsView> DefectDetailsView { get; set; }
+        public DbSet<TrelloUserStory> TrelloUserStories { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -40,6 +42,8 @@ namespace GestaoDefeitos.Infrastructure.Database
             builder.ApplyConfiguration(new DefectRelationConfiguration());
             builder.ApplyConfiguration(new DefectHistoryConfigurations());
             builder.ApplyConfiguration(new DefectCommentConfiguration());
+            builder.ApplyConfiguration(new TrelloUserStoryConfiguration());
+            builder.ApplyConfiguration(new DefectAttachmentConfiguration());
 
             builder.Entity<DefectDetailsView>().HasNoKey().ToView("vw_DefectDetails");
         }
