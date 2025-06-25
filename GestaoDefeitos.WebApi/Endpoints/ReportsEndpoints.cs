@@ -11,6 +11,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 .WithTags("Reports");
 
             group.MapGetUserDefectsReport();
+            group.MapDownloadPdfReport();
 
             return endpoints;
         }
@@ -25,6 +26,24 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (userDefectsReport is not null)
                     ? Results.Ok(userDefectsReport)
                     : Results.BadRequest("Failed to fetch defect reports.");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapDownloadPdfReport(this RouteGroupBuilder group)
+        {
+            group.MapGet("/downloadPdfReport", async (
+                IMediator mediator) =>
+            {
+                //var userDefectsReport = await mediator.Send(new UserDefectsReportQuery());
+                //var document = new UserDefectsReportDocument(userDefectsReport);
+                //var pdfBytes = document.GeneratePdf();
+
+                //return (pdfBytes is not null)
+                //    ? Results.File(pdfBytes, "application/pdf", "relatorio-defeitos.pdf")
+                //    : Results.Problem("Error exporting PDF.");
 
             }).RequireAuthorization();
 
