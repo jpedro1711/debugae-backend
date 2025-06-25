@@ -14,5 +14,6 @@ namespace GestaoDefeitos.Domain.Interfaces.Repositories
             Guid contributorId, int page, int pageSize, CancellationToken cancellationToken);
         Task<PagedResult<DefectsSimplifiedViewModel>> GetDefectsByProjectPagedAsync(
             Guid projectId, int page, int pageSize, CancellationToken cancellationToken);
+        Task<List<Defect>> GetDefectsDataByProjectIdAsync(Guid projectId);
     }
 }

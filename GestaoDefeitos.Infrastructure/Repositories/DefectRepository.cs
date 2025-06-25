@@ -66,6 +66,13 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Defect>> GetDefectsDataByProjectIdAsync(Guid projectId)
+        {
+            return await _context.Defects
+                .Where(d => d.ProjectId == projectId)
+                .ToListAsync();
+        }
+
         public async Task<PagedResult<DefectsSimplifiedViewModel>> GetDefectsByProjectPagedAsync(
             Guid projectId, int page, int pageSize, CancellationToken cancellationToken)
         {

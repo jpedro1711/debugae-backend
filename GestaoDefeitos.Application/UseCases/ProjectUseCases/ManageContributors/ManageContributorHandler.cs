@@ -3,6 +3,7 @@ using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using GestaoDefeitos.Domain.Enums;
+using GestaoDefeitos.Application.Utils;
 
 namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.ManageContributors
 {
@@ -10,13 +11,20 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.ManageContributors
         (
             UserManager<Contributor> userManager,
             IProjectRepository projectRepository,
-            IProjectContributorRepository projectContributorRepository
+            IProjectContributorRepository projectContributorRepository,
+            AuthenticationContextAcessor authenticationContextAcessor
         ) : IRequestHandler<ManageContributorCommand, ManageContributorResponse?>
     {
         public async Task<ManageContributorResponse?> Handle(ManageContributorCommand request, CancellationToken cancellationToken)
         {
             var project = await projectRepository.GetByIdAsync(request.ProjectId)
                                 ?? throw new InvalidOperationException("Project not found. Please check the project ID.");
+
+            var currentLoggedUserProjectData = await projectContributorRepository.GetByProjectAndUserIds(project.Id ,authenticationContextAcessor.GetCurrentLoggedUserId()) 
+                                ?? throw new InvalidOperationException("Unable to retrieve logged user ID");
+
+            if (!currentLoggedUserProjectData.Role.Equals(ProjectRole.Administrator))
+                throw new InvalidOperationException("You do not have permission to manage contributors for this project.");
 
             var contributor = await userManager.FindByEmailAsync(request.ContributorEmail)
                                 ?? throw new InvalidOperationException("Contributor not found. Please check the contributor e-mail.");

@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Application.UseCases.Reports.GetContributorDefectsReport;
+using GestaoDefeitos.Domain.ViewModels;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -8,7 +9,7 @@ namespace GestaoDefeitos.Application.PdfReport
 {
     public static class PdfReportGenerator
     {
-        public static IDocument GenerateUserDefectReport(GetContributorDefectsReportResponse data, string loggedUsername)
+        public static IDocument GenerateUserDefectReport(List<DefectsSimplifiedViewModel> defects, string loggedUsername, string? projectName = null)
         {
             var emissionDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm", new CultureInfo("pt-BR"));
             var userName = loggedUsername;
@@ -39,9 +40,17 @@ namespace GestaoDefeitos.Application.PdfReport
                                 .FontSize(10)
                                 .FontColor(Colors.Grey.Darken1);
 
-                            stack.Item().Text($"Usuário: {userName}")
+                            if (projectName is not null && projectName.Length > 0)
+                            {
+                                stack.Item().Text($"Projeto: {projectName}")
                                 .FontSize(10)
                                 .FontColor(Colors.Grey.Darken1);
+                            }
+
+
+                            stack.Item().Text($"Usuário: {userName}")
+                            .FontSize(10)
+                            .FontColor(Colors.Grey.Darken1);
                         });
 
                         row.ConstantItem(50);
@@ -49,12 +58,12 @@ namespace GestaoDefeitos.Application.PdfReport
 
                     page.Content().PaddingVertical(1, Unit.Centimetre).Column(stack =>
                     {
-                        var statusGroups = data.defects
+                        var statusGroups = defects
                             .GroupBy(d => d.Status.ToUpper())
                             .OrderBy(g => g.Key)
                             .ToDictionary(g => g.Key, g => g.Count());
 
-                        var priorityGroups = data.defects
+                        var priorityGroups = defects
                             .GroupBy(d => d.DefectPriority.ToUpper())
                             .OrderBy(g => g.Key)
                             .ToDictionary(g => g.Key, g => g.Count());
@@ -115,7 +124,7 @@ namespace GestaoDefeitos.Application.PdfReport
                                 });
 
                                 int index = 1;
-                                foreach (var defect in data.defects)
+                                foreach (var defect in defects)
                                 {
                                     table.Cell().Text(index.ToString());
                                     table.Cell().Text(defect.Summary);
