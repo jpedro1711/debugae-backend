@@ -1,5 +1,7 @@
 ﻿using GestaoDefeitos.Application.PdfReport;
+using GestaoDefeitos.Application.UseCases.Reports.GetContributorDefectsReport;
 using GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport;
+using GestaoDefeitos.Application.Utils;
 using MediatR;
 using QuestPDF.Fluent;
 
@@ -37,10 +39,11 @@ namespace GestaoDefeitos.WebApi.Endpoints
         public static RouteGroupBuilder MapDownloadPdfReport(this RouteGroupBuilder group)
         {
             group.MapGet("/downloadPdfReport", async (
+                AuthenticationContextAcessor authenticationAcessor,
                 IMediator mediator) =>
             {
-                var userDefectsReport = await mediator.Send(new UserDefectsReportQuery());
-                var document = PdfReportGenerator.GenerateUserDefectReport();
+                var currentUserDefects = await mediator.Send(new GetContributorDefectsReportRequest());
+                var document = PdfReportGenerator.GenerateUserDefectReport(currentUserDefects, authenticationAcessor.GetCurrentLoggedUserName());
                 var pdfBytes = document.GeneratePdf();
 
                 return (pdfBytes is not null)
