@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GestaoDefeitos.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class CreateDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -67,21 +67,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Tags",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tags", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -382,6 +367,46 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tags_Defects_DefectId",
+                        column: x => x.DefectId,
+                        principalTable: "Defects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrelloUserStories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Desc = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ShortUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DefectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrelloUserStories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TrelloUserStories_Defects_DefectId",
+                        column: x => x.DefectId,
+                        principalTable: "Defects",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -471,6 +496,16 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 name: "IX_ProjectContributors_ContributorId",
                 table: "ProjectContributors",
                 column: "ContributorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_DefectId",
+                table: "Tags",
+                column: "DefectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrelloUserStories_DefectId",
+                table: "TrelloUserStories",
+                column: "DefectId");
         }
 
         /// <inheritdoc />
@@ -511,6 +546,9 @@ namespace GestaoDefeitos.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tags");
+
+            migrationBuilder.DropTable(
+                name: "TrelloUserStories");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

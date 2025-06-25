@@ -1,6 +1,4 @@
-﻿using GestaoDefeitos.Application.TrelloIntegration;
-using GestaoDefeitos.Domain.Enums;
-using GestaoDefeitos.Domain.ViewModels;
+﻿using GestaoDefeitos.Domain.ViewModels;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
 {
@@ -10,16 +8,16 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
             string? DefectSummary,
             DateTime? CreatedAt,
             string? CreatedByUser,
-            DefectSeverity? DefectSeverity,
-            DefectStatus? DefectStatus,
+            string? DefectSeverity,
+            string? DefectStatus,
             DateTime? ExpirationDate,
-            DefectCategory? DefectCategory,
+            string? DefectCategory,
             DefectResponsibleContributorViewModel? ResponsibleContributor,
             DefectDetailsViewModel? Details,
             List<DefectCommentViewModel>? Comments,
             DefectAttachmentViewModel? Attachment,
             List<DefectsSimplifiedViewModel>? RelatedDefects,
             List<DefectHistoryViewModel> History,
-            List<TrelloUserStory> TrelloUserStories
+            List<TrelloUserStoryViewModel> TrelloUserStories
         );
 }

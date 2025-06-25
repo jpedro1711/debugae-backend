@@ -10,20 +10,111 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
 {
     public class GetDefectDetailsHandler
         (
-            IDefectDetailsViewRepository defectDetailsViewRepository,
-            ITrelloUserStoryRepository trelloUserStoryRepository
+            IDefectRepository defectRepository,
+            ITagRepository tagRepository,
+            IDefectHistoryRepository defectHistoryRepository,
+            IDefectCommentRepository defectCommentRepository,
+            IDefectRelationRepository defectRelationRepository,
+            IDefectAttachmentRepository defectAttachmentRepository,
+            ITrelloUserStoryRepository trelloUserStoryRepository,
+            IContributorRepository contributorRepository,
+            IProjectRepository projectRepository
         ) : IRequestHandler<GetDefectDetailsQuery, GetDefectDetailsResponse?>
     {
         public async Task<GetDefectDetailsResponse?> Handle(GetDefectDetailsQuery query, CancellationToken cancellationToken)
         {
-            var defectDetails = await defectDetailsViewRepository.GetDefectDetails(query.DefectId, cancellationToken);
+            var defect = await defectRepository.GetByIdAsync(query.DefectId) ?? throw new ArgumentException("Invalid defect Id");
 
-            var userStories = await trelloUserStoryRepository.GetUserStoriesByDefectId(query.DefectId);
+            var defectTags = await tagRepository.GetTagsByDefect(query.DefectId);
 
-            if (defectDetails == null)
-                return null;
+            var defectUserStories = await trelloUserStoryRepository.GetUserStoriesByDefectId(query.DefectId);
 
-            return MapToDefectDetailsResponse(defectDetails, userStories);
+            var defectHistory = await defectHistoryRepository.GetDefectHistoryByDefectIdAsync(query.DefectId, cancellationToken);
+
+            var defectComments = await defectCommentRepository.GetCommentsByDefectIdAsync(query.DefectId, cancellationToken);
+
+            var attachment = await defectAttachmentRepository.GetAttachmentByDefectIdAsync(query.DefectId);
+
+            var assignedContributor = await contributorRepository.GetByIdAsync(defect.AssignedToContributorId);
+
+            var relatedDefects = await defectRelationRepository.GetRelationsByDefectIdAsync(query.DefectId, cancellationToken);
+
+            var defectProject = await projectRepository.GetByIdAsync(defect.ProjectId);
+
+            defect.TrelloUserStories = defectUserStories!;
+            defect.DefectHistory = defectHistory!;
+            defect.Comments = defectComments!;
+            defect.Attachment = attachment;
+            defect.RelatedDefects = relatedDefects!;
+            defect.Tags = defectTags;
+            defect.AssignedToContributor = assignedContributor!;
+            defect.Project = defectProject!;
+
+            return MapDefectToResponse(defect) ?? throw new ArgumentException("Failed to map defect to response");
+        }
+
+        private static string? GetCreatedByFullName(List<DefectHistory> defectHistory)
+        {
+            var creationHistory = defectHistory.FirstOrDefault(dh => dh.Action == DefectAction.Create);
+            return creationHistory?.Contributor.FullName;
+        }
+
+        private static GetDefectDetailsResponse? MapDefectToResponse(Defect defect)
+        {
+            return new GetDefectDetailsResponse(
+                    defect.Id,
+                    defect.Description,
+                    defect.Summary,
+                    defect.CreatedAt,
+                    GetCreatedByFullName(defect.DefectHistory),
+                    defect.DefectSeverity.ToString(),
+                    defect.Status.ToString(),
+                    defect.ExpiresIn,
+                    defect.DefectCategory.ToString(),
+                    new DefectResponsibleContributorViewModel(
+                        defect.AssignedToContributor.Id,
+                        defect.AssignedToContributor.FullName
+                    ),
+                    new DefectDetailsViewModel(
+                        defect.Description,
+                        defect.DefectEnvironment.ToString(),
+                        defect.ActualBehaviour,
+                        defect.ExpectedBehaviour,
+                        defect.Project.Name,
+                        defect.AssignedToContributor.FullName
+                    ),
+                    defect.Comments.Select(c => new DefectCommentViewModel(
+                        c.Contributor.FullName,
+                        c.Content,
+                        c.CreatedAt
+                    )).ToList(),
+                    defect.Attachment != null ? new DefectAttachmentViewModel(
+                        defect.Attachment.FileName,
+                        defect.Attachment.FileType,
+                        defect.Attachment.CreatedAt,
+                        defect.Attachment.UploadByUsername
+                    ) : null,
+                    defect.RelatedDefects.Select(rd => new DefectsSimplifiedViewModel(
+                        rd.RelatedDefect.Id,
+                        rd.RelatedDefect.Description,
+                        rd.RelatedDefect.Summary,
+                        rd.RelatedDefect.Status.ToString(),
+                        rd.RelatedDefect.DefectPriority.ToString(),
+                        rd.RelatedDefect.CreatedAt
+                    )).ToList(),
+                    GetDefectHistoryViewModel(defect.DefectHistory.Select(dh => new DefectHistoryWithValueViewModel(
+                        dh.Action,
+                        dh.CreatedAt,
+                        dh.ContributorId,
+                        dh.OldMetadataJson,
+                        dh.NewMetadataJson
+                    )).ToList()),
+                    defect.TrelloUserStories.Select(ts => new TrelloUserStoryViewModel(
+                        ts.Desc,
+                        ts.ShortUrl,
+                        ts.DefectId
+                    )).ToList()
+                );
         }
 
         private static List<DefectHistoryViewModel> GetDefectHistoryViewModel(List<DefectHistoryWithValueViewModel> defectHistoryWithValues)
@@ -60,49 +151,6 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
             }
 
             return consolidatedHistory;
-        }
-
-        private static GetDefectDetailsResponse? MapToDefectDetailsResponse(DefectDetailsView? defectDetailsView, List<TrelloUserStory?> trelloUserStories)
-        {
-            if (defectDetailsView is null)
-                return null;
-
-            return new GetDefectDetailsResponse(
-                    defectDetailsView.Id,
-                    defectDetailsView.Description,
-                    defectDetailsView.Summary,
-                    defectDetailsView.CreatedAt,
-                    defectDetailsView.CreatedBy,
-                    defectDetailsView.DefectSeverity,
-                    defectDetailsView.Status,
-                    defectDetailsView.ExpiresIn,
-                    defectDetailsView.DefectCategory,
-                    new DefectResponsibleContributorViewModel
-                    (
-                        defectDetailsView.AssignedTo,
-                        defectDetailsView.ContributorName
-                    ),
-                    new DefectDetailsViewModel
-                    (
-                        defectDetailsView.Description,
-                        defectDetailsView.DefectEnvironment.ToString(),
-                        defectDetailsView.ActualBehaviour,
-                        defectDetailsView.ExpectedBehaviour,
-                        defectDetailsView.ProjectName,
-                        defectDetailsView.ContributorName
-                    ),
-                    defectDetailsView.Comments,
-                    new DefectAttachmentViewModel
-                    (
-                        defectDetailsView.AttachmentFileName,
-                        defectDetailsView.AttachmentFileType,
-                        defectDetailsView.AttachmentCreatedAt,
-                        defectDetailsView.UploadByUsername
-                    ),
-                    defectDetailsView.RelatedDefects,
-                    GetDefectHistoryViewModel(defectDetailsView.History),
-                    trelloUserStories
-                );
         }
 
     }

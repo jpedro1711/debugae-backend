@@ -68,7 +68,7 @@ namespace GestaoDefeitos.Application.TrelloIntegration
             return await TrelloGetAsync(url, token, secret);
         }
 
-        public async Task<string> AddCommentAsync(string userId, string cardId, string comment, Guid defectId)
+        public async Task<TrelloUserStory> AddCommentAsync(string userId, string cardId, string comment, Guid defectId)
         {
             var (token, secret) = EnsureToken(userId);
             var url = string.Format(_options.AddCommentUrl, cardId, Uri.EscapeDataString(comment));
@@ -86,9 +86,9 @@ namespace GestaoDefeitos.Application.TrelloIntegration
                 DefectId = defectId
             };
 
-            await _trelloUserStoryRepository.AddAsync(trelloUserStory);
+            var userStory = await _trelloUserStoryRepository.AddAsync(trelloUserStory);
 
-            return createdComment;
+            return userStory;
         }
 
         public async Task<string> GetLoginRedirectUrlAsync()

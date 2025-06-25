@@ -46,7 +46,7 @@ public class TrelloController(AuthenticationContextAcessor _authenticationContex
     }
 
     [HttpPost("cards/{cardId}/defects/{defectId}/comments/{comment}")]
-    public async Task<string> AddComment(string cardId, Guid defectId, string comment)
+    public async Task<TrelloUserStory> AddComment(string cardId, Guid defectId, string comment)
     {
         return await _trelloIntegrationService.AddCommentAsync(_authenticationContextAcessor.GetCurrentLoggedUserId().ToString(), cardId, comment, defectId);
     }

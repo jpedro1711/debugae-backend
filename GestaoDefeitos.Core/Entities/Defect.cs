@@ -28,6 +28,7 @@ namespace GestaoDefeitos.Domain.Entities
         public List<DefectRelation> RelatedToDefects { get; set; } = [];
         public List<DefectHistory> DefectHistory { get; set; } = [];
         public List<TrelloUserStory> TrelloUserStories { get; set; } = [];
+        public List<Tag> Tags { get; set; } = [];
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }

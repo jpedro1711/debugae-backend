@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestaoDefeitos.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250620002623_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250625125141_CreateDB")]
+    partial class CreateDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,28 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("GestaoDefeitos.Application.TrelloIntegration.TrelloUserStory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DefectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Desc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShortUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DefectId");
+
+                    b.ToTable("TrelloUserStories");
+                });
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.Contributor", b =>
                 {
@@ -277,79 +299,6 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.ToTable("DefectComments");
                 });
 
-            modelBuilder.Entity("GestaoDefeitos.Domain.Entities.DefectDetailsView", b =>
-                {
-                    b.Property<string>("ActualBehaviour")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("AssignedTo")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("AttachmentCreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AttachmentFileName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AttachmentFileType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CommentsJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContributorName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DefectCategory")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DefectEnvironment")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DefectSeverity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExpectedBehaviour")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ExpiresIn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("HistoryJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ProjectName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RelatedDefectsJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UploadByUsername")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("vw_DefectDetails", (string)null);
-                });
-
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.DefectHistory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -472,6 +421,8 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DefectId");
 
                     b.ToTable("Tags");
                 });
@@ -607,6 +558,17 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("GestaoDefeitos.Application.TrelloIntegration.TrelloUserStory", b =>
+                {
+                    b.HasOne("GestaoDefeitos.Domain.Entities.Defect", "Defect")
+                        .WithMany("TrelloUserStories")
+                        .HasForeignKey("DefectId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("Defect");
+                });
+
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.ContributorNotification", b =>
                 {
                     b.HasOne("GestaoDefeitos.Domain.Entities.Contributor", "Contributor")
@@ -724,6 +686,17 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("GestaoDefeitos.Domain.Entities.Tag", b =>
+                {
+                    b.HasOne("GestaoDefeitos.Domain.Entities.Defect", "Defect")
+                        .WithMany("Tags")
+                        .HasForeignKey("DefectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Defect");
+                });
+
             modelBuilder.Entity("GestaoDefeitos.Domain.Identity.ApplicationRoleClaim", b =>
                 {
                     b.HasOne("GestaoDefeitos.Domain.Identity.ApplicationRole", null)
@@ -791,6 +764,10 @@ namespace GestaoDefeitos.Infrastructure.Migrations
                     b.Navigation("RelatedDefects");
 
                     b.Navigation("RelatedToDefects");
+
+                    b.Navigation("Tags");
+
+                    b.Navigation("TrelloUserStories");
                 });
 
             modelBuilder.Entity("GestaoDefeitos.Domain.Entities.Project", b =>

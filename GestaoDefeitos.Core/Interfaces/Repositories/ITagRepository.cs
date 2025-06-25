@@ -6,5 +6,6 @@ namespace GestaoDefeitos.Domain.Interfaces.Repositories
     {
         Task<Tag?> GetTagByValueAsync(string tagValue, CancellationToken cancellationToken);
         Task<bool> TagExistsAsync(string tagValue, CancellationToken cancellationToken);
+        Task<List<Tag>> GetTagsByDefect(Guid defectId);
     }
 }

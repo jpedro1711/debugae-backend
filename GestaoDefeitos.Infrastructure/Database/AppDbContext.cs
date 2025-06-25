@@ -31,7 +31,6 @@ namespace GestaoDefeitos.Infrastructure.Database
         public DbSet<DefectComment> DefectComments { get; set; }
         public DbSet<DefectAttachment> DefectAttachments { get; set; }
         public DbSet<DefectRelation> DefectRelations { get; set; }
-        public DbSet<DefectDetailsView> DefectDetailsView { get; set; }
         public DbSet<TrelloUserStory> TrelloUserStories { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -44,8 +43,6 @@ namespace GestaoDefeitos.Infrastructure.Database
             builder.ApplyConfiguration(new DefectCommentConfiguration());
             builder.ApplyConfiguration(new TrelloUserStoryConfiguration());
             builder.ApplyConfiguration(new DefectAttachmentConfiguration());
-
-            builder.Entity<DefectDetailsView>().HasNoKey().ToView("vw_DefectDetails");
         }
     }
 }

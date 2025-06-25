@@ -19,5 +19,12 @@ namespace GestaoDefeitos.Infrastructure.Repositories
             return await _context.Tags
                 .AnyAsync(t => t.Description.Equals(tagValue), cancellationToken);
         }
+
+        public async Task<List<Tag>> GetTagsByDefect(Guid defectId)
+        {
+            return await _context.Tags
+                .Where(t => t.DefectId == defectId)
+                .ToListAsync();
+        }
     }
 }
