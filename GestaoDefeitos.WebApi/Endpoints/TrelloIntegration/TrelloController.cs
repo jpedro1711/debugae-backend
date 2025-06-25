@@ -1,8 +1,9 @@
 ﻿using GestaoDefeitos.Application.TrelloIntegration;
+using GestaoDefeitos.Application.TrelloIntegration.Responses;
 using GestaoDefeitos.Application.Utils;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GestaoDefeitos.WebApi.Endpoints;
+namespace GestaoDefeitos.WebApi.Endpoints.TrelloIntegration;
 [ApiController]
 [Route("api/trello")]
 public class TrelloController(AuthenticationContextAcessor _authenticationContextAcessor, ITrelloIntegrationService _trelloIntegrationService) : ControllerBase
@@ -27,25 +28,25 @@ public class TrelloController(AuthenticationContextAcessor _authenticationContex
     }
 
     [HttpGet("workspaces")]
-    public async Task<string> GetWorkspaces()
+    public async Task<List<TrelloWorkspaceViewModel>> GetWorkspaces()
     {
         return await _trelloIntegrationService.GetWorkspacesAsync(_authenticationContextAcessor.GetCurrentLoggedUserId().ToString());
     }
 
     [HttpGet("boards/{workspaceId}")]
-    public async Task<string> GetBoards(string workspaceId)
+    public async Task<List<TrelloBoardViewModel>> GetBoards(string workspaceId)
     {
         return await _trelloIntegrationService.GetBoardsAsync(_authenticationContextAcessor.GetCurrentLoggedUserId().ToString(), workspaceId);
     }
 
     [HttpGet("cards/{boardId}")]
-    public async Task<string> GetCards(string boardId)
+    public async Task<List<TrelloCardViewModel>> GetCards(string boardId)
     {
         return await _trelloIntegrationService.GetCardsAsync(_authenticationContextAcessor.GetCurrentLoggedUserId().ToString(), boardId);
     }
 
-    [HttpPost("cards/{cardId}/defects/{defectId}/comments")]
-    public async Task<string> AddComment(string cardId, Guid defectId, [FromBody] string comment)
+    [HttpPost("cards/{cardId}/defects/{defectId}/comments/{comment}")]
+    public async Task<string> AddComment(string cardId, Guid defectId, string comment)
     {
         return await _trelloIntegrationService.AddCommentAsync(_authenticationContextAcessor.GetCurrentLoggedUserId().ToString(), cardId, comment, defectId);
     }

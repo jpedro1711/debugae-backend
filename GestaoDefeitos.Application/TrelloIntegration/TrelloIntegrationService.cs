@@ -35,24 +35,30 @@ namespace GestaoDefeitos.Application.TrelloIntegration
             return true;
         }
 
-        public async Task<string> GetWorkspacesAsync(string userId)
+        public async Task<List<TrelloWorkspaceViewModel>> GetWorkspacesAsync(string userId)
         {
             var (token, secret) = EnsureToken(userId);
-            return await TrelloGetAsync(_options.GetWorkspacesUrl, token, secret);
+            var result =  await TrelloGetAsync(_options.GetWorkspacesUrl, token, secret);
+            List<TrelloWorkspaceViewModel> workspaces = JsonSerializer.Deserialize<List<TrelloWorkspaceViewModel>>(result) ?? [];
+            return workspaces;
         }
 
-        public async Task<string> GetBoardsAsync(string userId, string workspaceId)
+        public async Task<List<TrelloBoardViewModel>> GetBoardsAsync(string userId, string workspaceId)
         {
             var (token, secret) = EnsureToken(userId);
             var url = string.Format(_options.GetBoardsUrl, workspaceId);
-            return await TrelloGetAsync(url, token, secret);
+            var result = await TrelloGetAsync(url, token, secret);
+            List<TrelloBoardViewModel> boards = JsonSerializer.Deserialize<List<TrelloBoardViewModel>>(result) ?? [];
+            return boards;
         }
 
-        public async Task<string> GetCardsAsync(string userId, string boardId)
+        public async Task<List<TrelloCardViewModel>> GetCardsAsync(string userId, string boardId)
         {
             var (token, secret) = EnsureToken(userId);
             var url = string.Format(_options.GetCardsUrl, boardId);
-            return await TrelloGetAsync(url, token, secret);
+            var result = await TrelloGetAsync(url, token, secret);
+            List<TrelloCardViewModel> cards = JsonSerializer.Deserialize<List<TrelloCardViewModel>>(result) ?? [];
+            return cards;
         }
 
         public async Task<string> GetCardDetailsAsync(string userId, string cardId)
