@@ -1,4 +1,5 @@
 using GestaoDefeitos.WebApi.Extensions.ApplicationBuilder;
+using QuestPDF.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder
     .ConfigureDatabase();
 
 var app = builder.Build();
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 app
     .UseMiddlewares()

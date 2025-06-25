@@ -21,6 +21,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	<PackageReference Include="OAuth.DotNetCore" Version="3.0.1" />
+	<PackageReference Include="QuestPDF" Version="2025.5.1" />
   </ItemGroup>
 
   <ItemGroup>

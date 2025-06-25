@@ -1,5 +1,7 @@
-﻿using GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport;
+﻿using GestaoDefeitos.Application.PdfReport;
+using GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport;
 using MediatR;
+using QuestPDF.Fluent;
 
 namespace GestaoDefeitos.WebApi.Endpoints
 {
@@ -37,13 +39,13 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapGet("/downloadPdfReport", async (
                 IMediator mediator) =>
             {
-                //var userDefectsReport = await mediator.Send(new UserDefectsReportQuery());
-                //var document = new UserDefectsReportDocument(userDefectsReport);
-                //var pdfBytes = document.GeneratePdf();
+                var userDefectsReport = await mediator.Send(new UserDefectsReportQuery());
+                var document = PdfReportGenerator.GenerateUserDefectReport();
+                var pdfBytes = document.GeneratePdf();
 
-                //return (pdfBytes is not null)
-                //    ? Results.File(pdfBytes, "application/pdf", "relatorio-defeitos.pdf")
-                //    : Results.Problem("Error exporting PDF.");
+                return (pdfBytes is not null)
+                    ? Results.File(pdfBytes, "application/pdf", "relatorio-defeitos.pdf")
+                    : Results.Problem("Error exporting PDF.");
 
             }).RequireAuthorization();
 
