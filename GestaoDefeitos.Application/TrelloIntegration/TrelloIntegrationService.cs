@@ -72,7 +72,7 @@ namespace GestaoDefeitos.Application.TrelloIntegration
         {
             var (token, secret) = EnsureToken(userId);
             var url = string.Format(_options.AddCommentUrl, cardId, Uri.EscapeDataString(comment));
-            var createdComment =  await TrelloPostAsync(url, token, secret);
+            await TrelloPostAsync(url, token, secret);
 
             var cardDetails = await GetCardDetailsAsync(userId, cardId);
 
