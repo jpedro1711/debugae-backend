@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GestaoDefeitos.WebApi.Endpoints.TrelloIntegration;
 [ApiController]
-[Route("api/trello")]
+[Route("/trello")]
 public class TrelloController(AuthenticationContextAcessor _authenticationContextAcessor, ITrelloIntegrationService _trelloIntegrationService) : ControllerBase
 {
     [HttpGet("login")]
