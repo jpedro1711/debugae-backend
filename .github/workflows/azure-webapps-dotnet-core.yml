@@ -27,7 +27,7 @@ jobs:
         run: |
           dotnet restore GestaoDefeitos.sln
           dotnet build GestaoDefeitos.sln --configuration Release
-          dotnet publish ./GestaoDefeitos.WebApi/GestaoDefeitos.WebApi.csproj -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp'
+          dotnet publish ./GestaoDefeitos.WebApi/GestaoDefeitos.WebApi.csproj -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/debugae'
  
           
       - name: 'Run Azure webapp deploy action using Azure Credentials'
