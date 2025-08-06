@@ -109,11 +109,8 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
 
         public static WebApplication ConfigureWebApplication(this WebApplication webApplication)
         {
-            if (webApplication.Environment.IsDevelopment())
-            {
-                webApplication.UseSwagger();
-                webApplication.UseSwaggerUI();
-            }
+            webApplication.UseSwagger();
+            webApplication.UseSwaggerUI();
 
             webApplication.ApplyMigrations();
 
