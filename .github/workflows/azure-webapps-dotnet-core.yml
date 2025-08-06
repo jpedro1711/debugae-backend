@@ -25,9 +25,9 @@ jobs:
 
       - name: dotnet build and publish
         run: |
-          dotnet restore
-          dotnet build --configuration Release
-          dotnet publish -c Release --property:PublishDir='${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
+          dotnet restore GestaoDefeitos.sln
+          dotnet build GestaoDefeitos.sln --configuration Release
+          dotnet publish GestaoDefeitos\GestaoDefeitos.WebApi\GestaoDefeitos.WebApi.csproj -c Release --property:PublishDir='${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/debugae' 
           
       - name: 'Run Azure webapp deploy action using Azure Credentials'
         uses: azure/webapps-deploy@v3
