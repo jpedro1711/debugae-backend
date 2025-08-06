@@ -36,7 +36,8 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
                 {
                     policy.AllowAnyOrigin()
                           .AllowAnyMethod()
-                          .AllowAnyHeader();
+                          .AllowAnyHeader()
+                          .AllowCredentials();
                 });
             });
 
