@@ -30,11 +30,13 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             builder.Services.AddScoped<AuthenticationContextAcessor>();
             builder.Services.AddAuthorization();
 
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    policy.WithOrigins(allowedOrigins!)
                           .AllowAnyMethod()
                           .AllowAnyHeader()
                           .AllowCredentials();
