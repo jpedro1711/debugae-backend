@@ -1,0 +1,41 @@
+name: .NET Core
+
+on: [push]
+
+env:
+  AZURE_WEBAPP_NAME: debugae   
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      
+  DOTNET_VERSION: '8.0.x'         
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }} 
+
+      - name: dotnet build and publish
+        run: |
+          dotnet restore GestaoDefeitos.sln
+          dotnet build GestaoDefeitos.sln --configuration Release
+          dotnet publish ./GestaoDefeitos.WebApi/GestaoDefeitos.WebApi.csproj -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/debugae'
+ 
+          
+      - name: 'Run Azure webapp deploy action using Azure Credentials'
+        uses: azure/webapps-deploy@v3
+        with: 
+          app-name: ${{ env.AZURE_WEBAPP_NAME }} 
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/debugae'
+
+      - name: logout
+        run: |
+          az logout
