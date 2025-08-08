@@ -1,7 +1,9 @@
-﻿using GestaoDefeitos.Application.UseCases.ContributorUseCases.Register;
+﻿using GestaoDefeitos.Application.UseCases.ContributorUseCases.GetCurrentContributor;
+using GestaoDefeitos.Application.UseCases.ContributorUseCases.Register;
 using GestaoDefeitos.Infrastructure.Database;
 using MediatR;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace GestaoDefeitos.WebApi.Endpoints
 {
@@ -20,10 +22,11 @@ namespace GestaoDefeitos.WebApi.Endpoints
 
         public static RouteGroupBuilder MapGetContributorEndpoint(this RouteGroupBuilder group)
         {
-            group.MapGet("/me", async (ClaimsPrincipal claims, AppDbContext context) =>
+            group.MapGet("/me", async (IMediator mediator) =>
             {
-                var userId = Guid.Parse(claims.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
-                return await context.Users.FindAsync(userId);
+                var query = new GetCurrentContributorQuery();
+                var user = await mediator.Send(query);
+                return (user is not null) ? Results.Ok(user) : Results.NotFound("Contributor not found.");
             })
             .RequireAuthorization();
 
