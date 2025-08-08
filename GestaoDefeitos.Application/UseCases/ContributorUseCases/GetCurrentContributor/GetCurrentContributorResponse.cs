@@ -6,6 +6,6 @@
         string LastName, 
         string Email,
         string Department,
-        string Profession
+        string Position
     );
 }

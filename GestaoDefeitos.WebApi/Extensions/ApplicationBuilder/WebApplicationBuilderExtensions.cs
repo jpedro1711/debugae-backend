@@ -88,10 +88,19 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             })
             .AddCookie(IdentityConstants.ApplicationScheme, options =>
             {
+                options.Cookie.Name = "auth_cookie";
                 options.ExpireTimeSpan = TimeSpan.FromHours(1);
                 options.SlidingExpiration = true;
-            })
-            .AddBearerToken(IdentityConstants.BearerScheme);
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.HttpOnly = true;
+                options.LoginPath = string.Empty;
+                options.AccessDeniedPath = string.Empty;
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    return Task.CompletedTask;
+                };
+            });
+
 
             builder.Services.AddMemoryCache();
             builder.Services.Configure<TrelloApiOptions>(builder.Configuration.GetSection("TrelloApiOptions"));
