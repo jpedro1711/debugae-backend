@@ -95,10 +95,26 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
                 options.Cookie.HttpOnly = true;
                 options.LoginPath = string.Empty;
                 options.AccessDeniedPath = string.Empty;
+
                 options.Events.OnRedirectToLogin = context =>
                 {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Task.CompletedTask;
                 };
+            });
+
+            builder.Services.Configure<IdentityOptions>(options =>
+            {
+                // Regras de senha
+                options.Password.RequireDigit = false;             // Precisa de número
+                options.Password.RequiredLength = 2;              // Tamanho mínimo
+                options.Password.RequireNonAlphanumeric = false;  // Não exige caractere especial
+                options.Password.RequireUppercase = false;         // Precisa de letra maiúscula
+                options.Password.RequireLowercase = false;         // Precisa de letra minúscula
+                options.Password.RequiredUniqueChars = 1;         // Caracteres únicos mínimos
+
+                // Outras regras
+                options.User.RequireUniqueEmail = true;           // Email único por usuário
             });
 
 
@@ -130,6 +146,8 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
 
             webApplication.UseCors("AllowAll");
 
+
+            webApplication.UseAuthentication();
             webApplication.UseAuthorization();
 
             webApplication.MapControllers();

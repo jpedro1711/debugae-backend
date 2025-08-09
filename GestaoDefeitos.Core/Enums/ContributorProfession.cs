@@ -4,6 +4,8 @@ namespace GestaoDefeitos.Domain.Enums
 {
     public enum ContributorProfession
     {
+        [Description("Unknown")]
+        Unknown = 0,
         [Description("Developer")]
         Developer = 1,
         [Description("Tester")]

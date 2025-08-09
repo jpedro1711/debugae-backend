@@ -1,9 +1,8 @@
 ﻿using GestaoDefeitos.Application.UseCases.ContributorUseCases.GetCurrentContributor;
 using GestaoDefeitos.Application.UseCases.ContributorUseCases.Register;
-using GestaoDefeitos.Infrastructure.Database;
+using GestaoDefeitos.Domain.Entities;
 using MediatR;
-using System.Security.Claims;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Microsoft.AspNetCore.Identity;
 
 namespace GestaoDefeitos.WebApi.Endpoints
 {
@@ -16,6 +15,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
 
             group.MapGetContributorEndpoint();
             group.MapCreateContributorEndpoint();
+            group.MapLogoutContributorEndpoint();
 
             return endpoints;
         }
@@ -27,6 +27,18 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 var query = new GetCurrentContributorQuery();
                 var user = await mediator.Send(query);
                 return (user is not null) ? Results.Ok(user) : Results.NotFound("Contributor not found.");
+            })
+            .RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapLogoutContributorEndpoint(this RouteGroupBuilder group)
+        {
+            group.MapGet("/logout", async (SignInManager<Contributor> signInManager) =>
+            {
+                await signInManager.SignOutAsync();
+                return Results.Ok();
             })
             .RequireAuthorization();
 
