@@ -40,6 +40,10 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject
 
                     await projectContributorRepository.AddAsync(projectContributor);
                 }
+                else
+                {
+                    throw new InvalidOperationException("User not found: " + contributorEmail);
+                }
             }
 
             return new CreateProjectResponse(createdProject.Id);
