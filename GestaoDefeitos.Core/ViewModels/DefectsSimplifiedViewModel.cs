@@ -8,6 +8,7 @@ namespace GestaoDefeitos.Domain.ViewModels
             string Summary,
             string Status,
             string DefectPriority,
+            DateTime ExpirationDate,
             DateTime CreatedAt
         );
 }

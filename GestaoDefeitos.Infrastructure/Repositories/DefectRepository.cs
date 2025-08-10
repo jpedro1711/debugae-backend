@@ -21,6 +21,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         d.Summary,
                         d.Status.ToString(),
                         d.DefectPriority.ToString(),
+                        d.ExpiresIn,
                         d.CreatedAt
                        ))
                 .ToListAsync(cancellationToken);
@@ -55,6 +56,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         d.Summary,
                         d.Status.ToString(),
                         d.DefectPriority.ToString(),
+                        d.ExpiresIn,
                         d.CreatedAt
                        ))
                 .ToListAsync(cancellationToken);
@@ -92,6 +94,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     d.Summary,
                     d.Status.ToString(),
                     d.DefectPriority.ToString(),
+                    d.ExpiresIn,
                     d.CreatedAt
                 ))
                 .ToListAsync(cancellationToken);
@@ -117,6 +120,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     d.Summary,
                     d.Status.ToString(),
                     d.DefectPriority.ToString(),
+                    d.ExpiresIn,
                     d.CreatedAt
                 ))
                 .ToListAsync(cancellationToken);
@@ -170,6 +174,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                             rd.RelatedDefect.Summary,
                             rd.RelatedDefect.Status.ToString(),
                             rd.RelatedDefect.DefectPriority.ToString(),
+                            d.ExpiresIn,
                             rd.RelatedDefect.CreatedAt
                         )),
                         null, // it will be populated in the handler
