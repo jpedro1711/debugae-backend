@@ -19,7 +19,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddCommentToDefect
             if (defect is null)
                 return null;
 
-            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId(); ;
+            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
             var newComment = new DefectComment
             {

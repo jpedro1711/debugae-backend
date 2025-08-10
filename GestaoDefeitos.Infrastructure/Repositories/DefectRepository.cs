@@ -1,5 +1,6 @@
 ﻿using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Entities.Base.GestaoDefeitos.Domain.Pagination;
+using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Domain.ViewModels;
 using GestaoDefeitos.Infrastructure.Database;
@@ -121,6 +122,63 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
 
             return new PagedResult<DefectsSimplifiedViewModel>(items, totalCount, page, pageSize);
+        }
+
+        public async Task<DefectFullDetailsViewModel> GetDefectDetails(Guid defectId, CancellationToken cancellationToken)
+        {
+            return await _context
+                    .Defects
+                    .AsNoTracking()
+                    .AsSplitQuery()
+                    .Where(defect => defect.Id == defectId)
+                    .Select(d => new DefectFullDetailsViewModel(
+                        d.Id,
+                        d.Description,
+                        d.Summary,
+                        d.CreatedAt,
+                        d.DefectHistory.Single(dh => dh.Action == DefectAction.Create).Contributor.FullName,
+                        d.DefectSeverity.ToString(),
+                        d.Status.ToString(),
+                        d.ExpiresIn,
+                        d.DefectCategory.ToString(),
+                        new DefectResponsibleContributorViewModel(
+                            d.AssignedToContributor.Id,
+                            d.AssignedToContributor.FullName
+                        ),
+                        new DefectDetailsViewModel(
+                            d.Description,
+                            d.DefectEnvironment.ToString(),
+                            d.ActualBehaviour,
+                            d.ExpectedBehaviour,
+                            d.Project.Name,
+                            d.AssignedToContributor.FullName
+                        ),
+                        d.Comments.Select(c => new DefectCommentViewModel(
+                            c.Contributor.FullName,
+                            c.Content,
+                            c.CreatedAt
+                        )),
+                        d.Attachment != null ? new DefectAttachmentViewModel(
+                            d.Attachment.FileName,
+                            d.Attachment.FileType,
+                            d.Attachment.CreatedAt,
+                            d.Attachment.UploadByUsername
+                        ) : null,
+                        d.RelatedDefects.Select(rd => new DefectsSimplifiedViewModel(
+                            rd.RelatedDefect.Id,
+                            rd.RelatedDefect.Description,
+                            rd.RelatedDefect.Summary,
+                            rd.RelatedDefect.Status.ToString(),
+                            rd.RelatedDefect.DefectPriority.ToString(),
+                            rd.RelatedDefect.CreatedAt
+                        )),
+                        null, // it will be populated in the handler
+                        d.TrelloUserStories.Select(ts => new TrelloUserStoryViewModel(
+                            ts.Desc,
+                            ts.ShortUrl,
+                            ts.DefectId
+                        ))
+                    )).SingleAsync(cancellationToken);
         }
 
     }
