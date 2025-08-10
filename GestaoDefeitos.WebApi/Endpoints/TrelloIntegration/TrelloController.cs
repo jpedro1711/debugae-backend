@@ -1,6 +1,7 @@
 ﻿using GestaoDefeitos.Application.TrelloIntegration;
 using GestaoDefeitos.Application.TrelloIntegration.Responses;
 using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestaoDefeitos.WebApi.Endpoints.TrelloIntegration;

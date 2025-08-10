@@ -1,7 +1,5 @@
-﻿namespace GestaoDefeitos.Application.TrelloIntegration
+﻿namespace GestaoDefeitos.Domain.Entities
 {
-    using GestaoDefeitos.Domain.Entities;
-
     public class TrelloUserStory
     {
         public Guid? Id { get; set; }

@@ -1,17 +1,16 @@
 ﻿using GestaoDefeitos.Application.Assembly;
+using GestaoDefeitos.Application.Cache;
 using GestaoDefeitos.Application.TrelloIntegration;
 using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Infrastructure.Database;
 using GestaoDefeitos.Infrastructure.Repositories;
-using GestaoDefeitos.WebApi.Cache;
 using GestaoDefeitos.WebApi.Endpoints;
 using GestaoDefeitos.WebApi.Extensions.Migrations;
 using GestaoDefeitos.WebApi.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System.Text.Json.Serialization;
 
 namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder

@@ -1,4 +1,4 @@
-﻿using GestaoDefeitos.Application.TrelloIntegration;
+﻿using GestaoDefeitos.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

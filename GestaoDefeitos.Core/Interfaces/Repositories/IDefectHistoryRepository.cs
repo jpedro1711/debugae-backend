@@ -1,10 +1,11 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Domain.Entities.Events;
+using GestaoDefeitos.Domain.ViewModels;
 
 namespace GestaoDefeitos.Domain.Interfaces.Repositories
 {
-    public interface IDefectHistoryRepository : IBaseRepository<DefectHistory>
+    public interface IDefectHistoryRepository : IBaseRepository<DefectChangeEvent>
     {
-        Task<DefectHistory?> GetDefectCreateHistoryByDefectIdAsync(Guid defectId, CancellationToken cancellationToken);
-        Task<List<DefectHistory>> GetDefectHistoryByDefectIdAsync(Guid defectId, CancellationToken cancellationToken);
+        Task<DefectChangeEvent?> GetDefectCreateHistoryByDefectIdAsync(Guid defectId, CancellationToken cancellationToken);
+        Task<List<DefectHistoryViewModel>> GetDefectHistoryByDefectIdAsync(Guid defectId, CancellationToken cancellationToken);
     }
 }

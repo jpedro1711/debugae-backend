@@ -1,5 +1,4 @@
-﻿using GestaoDefeitos.Application.UseCases.Reports.GetContributorDefectsReport;
-using GestaoDefeitos.Domain.ViewModels;
+﻿using GestaoDefeitos.Domain.ViewModels;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -9,8 +8,11 @@ namespace GestaoDefeitos.Application.PdfReport
 {
     public static class PdfReportGenerator
     {
-        public static IDocument GenerateUserDefectReport(List<DefectsSimplifiedViewModel> defects, string loggedUsername, string? projectName = null)
+        public static IDocument GenerateUserDefectReport(List<DefectsSimplifiedViewModel>? defects, string loggedUsername, string? projectName = null)
         {
+            if (defects is null)
+                throw new ArgumentNullException(nameof(defects), "Defects cannot be null");
+
             var emissionDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm", new CultureInfo("pt-BR"));
             var userName = loggedUsername;
 

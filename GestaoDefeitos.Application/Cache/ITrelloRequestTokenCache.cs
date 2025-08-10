@@ -1,4 +1,4 @@
-﻿namespace GestaoDefeitos.WebApi.Cache
+﻿namespace GestaoDefeitos.Application.Cache
 {
     public interface ITrelloRequestTokenCache
     {

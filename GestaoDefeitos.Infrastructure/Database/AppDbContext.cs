@@ -1,5 +1,5 @@
-﻿using GestaoDefeitos.Application.TrelloIntegration;
-using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.Entities.Events;
 using GestaoDefeitos.Domain.Identity;
 using GestaoDefeitos.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -27,7 +27,7 @@ namespace GestaoDefeitos.Infrastructure.Database
         public DbSet<ProjectContributor> ProjectContributors { get; set; }
         public DbSet<ContributorNotification> ContributorNotifications { get; set; }
         public DbSet<Tag> Tags { get; set; }
-        public DbSet<DefectHistory> DefectHistory { get; set; }
+        public DbSet<DefectChangeEvent> DefectHistory { get; set; }
         public DbSet<DefectComment> DefectComments { get; set; }
         public DbSet<DefectAttachment> DefectAttachments { get; set; }
         public DbSet<DefectRelation> DefectRelations { get; set; }
@@ -39,7 +39,7 @@ namespace GestaoDefeitos.Infrastructure.Database
             builder.ApplyConfiguration(new ContributorConfiguration());
             builder.ApplyConfiguration(new ProjectContributorConfiguration());
             builder.ApplyConfiguration(new DefectRelationConfiguration());
-            builder.ApplyConfiguration(new DefectHistoryConfigurations());
+            builder.ApplyConfiguration(new DefectChangeEventConfigurations());
             builder.ApplyConfiguration(new DefectCommentConfiguration());
             builder.ApplyConfiguration(new TrelloUserStoryConfiguration());
             builder.ApplyConfiguration(new DefectAttachmentConfiguration());

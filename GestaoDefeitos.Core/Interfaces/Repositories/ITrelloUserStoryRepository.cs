@@ -1,4 +1,4 @@
-﻿using GestaoDefeitos.Application.TrelloIntegration;
+﻿using GestaoDefeitos.Domain.Entities;
 
 namespace GestaoDefeitos.Domain.Interfaces.Repositories
 {

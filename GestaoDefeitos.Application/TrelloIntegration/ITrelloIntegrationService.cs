@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Application.TrelloIntegration.Responses;
+using GestaoDefeitos.Domain.Entities;
 
 namespace GestaoDefeitos.Application.TrelloIntegration
 {

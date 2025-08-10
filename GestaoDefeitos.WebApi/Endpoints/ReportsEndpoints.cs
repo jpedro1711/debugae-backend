@@ -1,6 +1,6 @@
 ﻿using GestaoDefeitos.Application.PdfReport;
-using GestaoDefeitos.Application.UseCases.Reports.GetContributorDefectsReport;
-using GestaoDefeitos.Application.UseCases.Reports.GetProjectDefectsReport;
+using GestaoDefeitos.Application.UseCases.Reports.GetContributorDefectsReportPdfData;
+using GestaoDefeitos.Application.UseCases.Reports.GetProjectDefectsReportPdfData;
 using GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport;
 using GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport;
 using GestaoDefeitos.Application.Utils;

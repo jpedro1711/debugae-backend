@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 
-namespace GestaoDefeitos.WebApi.Cache
+namespace GestaoDefeitos.Application.Cache
 {
     public class TrelloRequestTokenCach(IMemoryCache _cache) : ITrelloRequestTokenCache
     {

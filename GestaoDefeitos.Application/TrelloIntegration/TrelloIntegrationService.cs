@@ -1,6 +1,7 @@
-﻿using GestaoDefeitos.Application.TrelloIntegration.Responses;
+﻿using GestaoDefeitos.Application.Cache;
+using GestaoDefeitos.Application.TrelloIntegration.Responses;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
-using GestaoDefeitos.WebApi.Cache;
 using Microsoft.Extensions.Options;
 using OAuth;
 using System.Text.Json;

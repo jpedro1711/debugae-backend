@@ -1,4 +1,4 @@
-﻿namespace GestaoDefeitos.Application.TrelloIntegration.Responses
+﻿namespace GestaoDefeitos.Domain.Entities
 {
     using System.Text.Json.Serialization;
 

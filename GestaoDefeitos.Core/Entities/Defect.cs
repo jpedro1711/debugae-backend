@@ -1,4 +1,4 @@
-﻿using GestaoDefeitos.Application.TrelloIntegration;
+﻿using GestaoDefeitos.Domain.Entities.Events;
 using GestaoDefeitos.Domain.Enums;
 
 namespace GestaoDefeitos.Domain.Entities
@@ -26,7 +26,7 @@ namespace GestaoDefeitos.Domain.Entities
         public List<DefectComment> Comments { get; set; } = [];
         public List<DefectRelation> RelatedDefects { get; set; } = [];
         public List<DefectRelation> RelatedToDefects { get; set; } = [];
-        public List<DefectHistory> DefectHistory { get; set; } = [];
+        public List<DefectChangeEvent> DefectHistory { get; set; } = [];
         public List<TrelloUserStory> TrelloUserStories { get; set; } = [];
         public List<Tag> Tags { get; set; } = [];
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

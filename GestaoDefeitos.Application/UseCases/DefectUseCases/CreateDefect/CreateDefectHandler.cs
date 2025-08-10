@@ -1,5 +1,7 @@
-﻿using GestaoDefeitos.Application.Utils;
+﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.DefectChangedEvent;
+using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.Entities.Events;
 using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
@@ -11,13 +13,13 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
     public class CreateDefectHandler(
         IDefectRepository defectRepository,
         IDefectAttachmentRepository defectAttachmentRepository,
-        IDefectHistoryRepository defectHistoryRepository,
         AuthenticationContextAcessor authenticationContextAcessor,
         IDefectRelationRepository defectRelationRepository,
         IProjectContributorRepository projectContributorRepository,
         IContributorNotificationRepository contributorNotificationRepository,
         IProjectRepository projectRepository,
-        IContributorRepository contributorRepository
+        IContributorRepository contributorRepository,
+        IMediator mediator
         ) : IRequestHandler<CreateDefectCommand, CreateDefectResponse?>
     {
         public async Task<CreateDefectResponse?> Handle(CreateDefectCommand command, CancellationToken cancellationToken)
@@ -45,7 +47,17 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             if (assignedUser.Id != loggedUserId)
                 await SaveUserNotification(assignedUser.Id, contributorNotificationRepository, newDefect.Id);
 
-            await CreateDefectHistory(newDefect, defectHistoryRepository, loggedUserId);
+            await mediator.Publish(new DefectChangeNotification
+            {
+                DefectId = savedDefect.Id,
+                ContributorId = loggedUserId,
+                Action = DefectAction.Create,
+                Field = null,
+                OldValue = null,
+                NewValue = null,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }, cancellationToken);
 
             await RelateToDuplicates(command, defectRepository, savedDefect.Id);
 
@@ -134,27 +146,6 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             newDefect.Attachment = savedAttachment;
 
             return savedAttachment;
-        }
-
-        private static async Task<DefectHistory> CreateDefectHistory(
-            Defect defect, 
-            IDefectHistoryRepository repository,
-            Guid contributorId
-           )
-        {
-            var history = new DefectHistory
-            {
-                Id = Guid.NewGuid(),
-                DefectId = defect.Id,
-                ContributorId = contributorId,
-                Action = DefectAction.Create,
-                OldMetadataJson = string.Empty,
-                NewMetadataJson = Serializer.Serialize(defect),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = null,
-            };
-
-            return await repository.AddAsync(history);
         }
 
         private static DateTime GetDefectExpirationDate(Defect defect)

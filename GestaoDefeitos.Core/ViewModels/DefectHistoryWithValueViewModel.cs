@@ -6,7 +6,8 @@ namespace GestaoDefeitos.Domain.ViewModels
             DefectAction Action,
             DateTime CreatedAt,
             Guid ContributorId,
-            string? OldMetadataJson,
-            string? NewMetadataJson
+            string? UpdatedField,
+            string? OldValue,
+            string? NewValue
         );
 }

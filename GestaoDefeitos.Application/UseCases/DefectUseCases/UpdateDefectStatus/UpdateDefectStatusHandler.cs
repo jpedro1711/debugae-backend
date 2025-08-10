@@ -1,18 +1,18 @@
-﻿using GestaoDefeitos.Application.Utils;
+﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.DefectChangedEvent;
+using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
-using Newtonsoft.Json;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
 {
     public class UpdateDefectStatusHandler
         (
             IDefectRepository defectRepository, 
-            IDefectHistoryRepository defectHistoryRepository,
             AuthenticationContextAcessor authenticationContextAcessor,
-            IContributorNotificationRepository contributorNotificationRepository
+            IContributorNotificationRepository contributorNotificationRepository,
+            IMediator mediator
         ) : IRequestHandler<UpdateDefectStatusCommand, UpdateDefectStatusResponse?>
     {
         public async Task<UpdateDefectStatusResponse?> Handle(UpdateDefectStatusCommand request, CancellationToken cancellationToken)
@@ -24,8 +24,6 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
 
             var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
-            var defectHistory = CreateDefectHistory(defect, loggedUserId);
-
             defect.Status = request.NewStatus;
 
             var updatedDefect = await defectRepository.UpdateAsync(defect);
@@ -33,27 +31,22 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
             if (updatedDefect is null)
                 return null;
 
-            defectHistory.NewMetadataJson = Serializer.Serialize(updatedDefect);
-            await defectHistoryRepository.AddAsync(defectHistory);
+            await mediator.Publish(new DefectChangeNotification
+            {
+                DefectId = defect.Id,
+                ContributorId = loggedUserId,
+                Action = DefectAction.Update,
+                Field = nameof(Defect.Status),
+                OldValue = defect.Status.ToString(),
+                NewValue = request.NewStatus.ToString(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }, cancellationToken);
 
             if (loggedUserId != defect.AssignedToContributorId)
                 await SaveUserNotification(defect.AssignedToContributorId, contributorNotificationRepository, updatedDefect.Id);
 
             return new UpdateDefectStatusResponse(defect.Id, defect.Status);
-        }
-
-        private static DefectHistory CreateDefectHistory(Defect defect, Guid loggedUserId)
-        {
-            return new DefectHistory
-            {
-                Id = Guid.NewGuid(),
-                DefectId = defect.Id,
-                ContributorId = loggedUserId,
-                Action = DefectAction.Update,
-                OldMetadataJson = Serializer.Serialize(defect),
-                CreatedAt = defect.CreatedAt,
-                UpdatedAt = DateTime.UtcNow,
-            };
         }
 
         private static async Task SaveUserNotification(Guid userId, IContributorNotificationRepository notificationRepository, Guid defectId)

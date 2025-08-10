@@ -1,7 +1,7 @@
 ﻿using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
 
-namespace GestaoDefeitos.Application.UseCases.Reports.GetProjectDefectsReport
+namespace GestaoDefeitos.Application.UseCases.Reports.GetProjectDefectsReportPdfData
 {
     public class GetProjectDefectsReportHandler(
         IDefectRepository defectRepository,
