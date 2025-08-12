@@ -38,6 +38,7 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
             )
         {
             return new GetProjectDetailsResponse(
+                    project.Id,
                     project.Name,
                     project.Description,
                     project.CreatedAt,
@@ -48,7 +49,8 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
                     totalDefectsResolved,
                     project.ProjectContributors.Select(pc => new ProjectColaboratorViewModel(
                         pc.Contributor.Id,
-                        pc.Contributor.Firstname + " " + pc.Contributor.Lastname
+                        pc.Contributor.Firstname + " " + pc.Contributor.Lastname,
+                        pc.Contributor.ProjectContributors.Single(x => x.ContributorId == pc.ContributorId).Role.ToString()
                     )).ToList(),
                     project.Defects.Select(d => new DefectsSimplifiedViewModel(
                         d.Id,

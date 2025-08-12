@@ -1,12 +1,10 @@
 ﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.DefectChangedEvent;
 using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Entities;
-using GestaoDefeitos.Domain.Entities.Events;
 using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
 {

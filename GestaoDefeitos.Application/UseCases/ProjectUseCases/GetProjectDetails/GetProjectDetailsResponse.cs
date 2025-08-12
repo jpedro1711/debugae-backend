@@ -3,6 +3,7 @@
 namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
 {
     public record GetProjectDetailsResponse(
+            Guid ProjectId,
             string ProjectName,
             string ProjectDescription,
             DateTime CreatedAt,

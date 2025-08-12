@@ -36,6 +36,22 @@ namespace GestaoDefeitos.Infrastructure.Repositories
             return new PagedResult<UsersProjectViewModel>(items, totalCount, page, pageSize);
         }
 
+        public async Task<List<UsersProjectViewModel>> GetAllProjectContributorsByUserIdAsync(Guid userId)
+        {
+            return await _context.ProjectContributors
+                .Where(pc => pc.ContributorId == userId)
+                .Include(pc => pc.Project)
+                .Select(pc => new UsersProjectViewModel
+                (
+                    pc.Project.Id.ToString(),
+                    pc.Project.Name,
+                    pc.Project.Description,
+                    pc.Project.ProjectContributors.Count,
+                    pc.Role.ToString()
+                ))
+                .ToListAsync();
+        }
+
         public async Task<bool> IsUserOnProject(Guid userId, Guid projectId)
         {
             return await _context.ProjectContributors

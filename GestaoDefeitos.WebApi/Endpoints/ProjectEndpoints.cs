@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject;
+using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetAllProjectFromUser;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetUserProjects;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.ManageContributors;
@@ -18,6 +19,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapGetUserProjects();
             group.MapGetProjectDetails();
             group.MapManageContributorstEndpoint();
+            group.MapGetAllUserProjects();
 
             return endpoints;
         }
@@ -86,6 +88,22 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (projectDetails is not null)
                     ? Results.Ok(projectDetails)
                     : Results.NotFound("Project not found.");
+
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapGetAllUserProjects(this RouteGroupBuilder group)
+        {
+            group.MapGet("/getAllProjectsFromUser", async (
+                IMediator mediator) =>
+            {
+                var userProjects = await mediator.Send(new GetAllProjectsFromUserQuery());
+
+                return (userProjects is not null)
+                    ? Results.Ok(userProjects)
+                    : Results.BadRequest("Failed to fetch user projects.");
 
             }).RequireAuthorization();
 
