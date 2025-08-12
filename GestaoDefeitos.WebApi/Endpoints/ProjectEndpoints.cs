@@ -3,6 +3,7 @@ using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetAllProjectFromUser;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.GetUserProjects;
 using GestaoDefeitos.Application.UseCases.ProjectUseCases.ManageContributors;
+using GestaoDefeitos.Application.UseCases.ProjectUseCases.UpdateProject;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapGetProjectDetails();
             group.MapManageContributorstEndpoint();
             group.MapGetAllUserProjects();
+            group.MapUpdateProject();
 
             return endpoints;
         }
@@ -105,6 +107,21 @@ namespace GestaoDefeitos.WebApi.Endpoints
                     ? Results.Ok(userProjects)
                     : Results.BadRequest("Failed to fetch user projects.");
 
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapUpdateProject(this RouteGroupBuilder group)
+        {
+            group.MapPatch("/updateProject", async(
+                [FromBody] UpdateProjectRequest request,
+                IMediator mediator) =>
+            {
+                var updatedProject = await mediator.Send(request);
+                return (updatedProject is not null)
+                    ? Results.Ok(updatedProject)
+                    : Results.BadRequest("Failed to update project.");
             }).RequireAuthorization();
 
             return group;

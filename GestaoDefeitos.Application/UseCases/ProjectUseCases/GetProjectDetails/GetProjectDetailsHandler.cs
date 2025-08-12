@@ -50,7 +50,8 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
                     project.ProjectContributors.Select(pc => new ProjectColaboratorViewModel(
                         pc.Contributor.Id,
                         pc.Contributor.Firstname + " " + pc.Contributor.Lastname,
-                        pc.Contributor.ProjectContributors.Single(x => x.ContributorId == pc.ContributorId).Role.ToString()
+                        pc.Contributor.ProjectContributors.Single(x => x.ContributorId == pc.ContributorId).Role.ToString(),
+                        pc.Contributor.Email!
                     )).ToList(),
                     project.Defects.Select(d => new DefectsSimplifiedViewModel(
                         d.Id,
