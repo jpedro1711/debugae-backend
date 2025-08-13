@@ -29,7 +29,15 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     pc.Project.Name,
                     pc.Project.Description,
                     pc.Project.ProjectContributors.Count,
-                    pc.Role.ToString()
+                    pc.Role.ToString(),
+                    pc.Project.ProjectContributors
+                        .Select(c => new ProjectColaboratorViewModel
+                        (
+                            c.ContributorId,
+                            c.Contributor.FullName,
+                            c.Role.ToString(),
+                            c.Contributor.Email
+                        )).ToList()
                 ))
                 .ToListAsync();
 
@@ -47,7 +55,15 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     pc.Project.Name,
                     pc.Project.Description,
                     pc.Project.ProjectContributors.Count,
-                    pc.Role.ToString()
+                    pc.Role.ToString(),
+                    pc.Project.ProjectContributors
+                        .Select(c => new ProjectColaboratorViewModel
+                        (
+                            c.ContributorId,
+                            c.Contributor.FullName,
+                            c.Role.ToString(),
+                            c.Contributor.Email
+                        )).ToList()
                 ))
                 .ToListAsync();
         }

@@ -5,7 +5,8 @@
         string ProjectName, 
         string ProjectDescription, 
         int MembersCount, 
-        string UserProjectRole
+        string UserProjectRole,
+        List<ProjectColaboratorViewModel> Colaborators
         )
     {
     }
