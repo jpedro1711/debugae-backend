@@ -3,6 +3,7 @@ using GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplicates;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.DownloadAttachment;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.GetAllDefectsFromUser;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectsByProject;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetUserDefects;
@@ -28,6 +29,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapAddCommentToDefect();
             group.MapGetDefectDetails();
             group.MapDownloadDefectAttachment();
+            group.MapGetAllDefectFromUser();
 
             return endpoints;
         }
@@ -187,6 +189,20 @@ namespace GestaoDefeitos.WebApi.Endpoints
                     ? Results.File(downloadAttachmentResponse.Content, downloadAttachmentResponse.ContentType, downloadAttachmentResponse.FileName)
                     : Results.NotFound("Defect has no attachments.");
 
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapGetAllDefectFromUser(this RouteGroupBuilder group)
+        {
+            group.MapGet("/getAllDefectsFromUser", async (IMediator mediator) =>
+            {
+                var userDefects = await mediator.Send(new GetAllDefectsFromUserQuery());
+
+                return (userDefects is not null)
+                    ? Results.Ok(userDefects)
+                    : Results.BadRequest("Could not get current logged user defects");
             }).RequireAuthorization();
 
             return group;

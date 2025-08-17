@@ -35,12 +35,13 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 {
                     DefectId = d.Id,
                     ProjectId = d.ProjectId.ToString(),
-                    AssignedToUserId = d.AssignedToContributorId.ToString(),
                     Summary = d.Summary,
                     Description = d.Description,
                     Category = d.DefectCategory.ToString(),
                     Severity = d.DefectSeverity.ToString(),
                     Environment = d.DefectEnvironment.ToString(),
+                    CreatedAt = d.CreatedAt,
+                    Status = d.Status.ToString(),
                     Version = d.Version
                 })
                 .ToListAsync(cancellationToken);

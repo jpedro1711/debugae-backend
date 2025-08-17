@@ -15,12 +15,13 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplica
             var newDefect = new DefectDuplicatesViewModel
             {
                 ProjectId = command.ProjectId.ToString(),
-                AssignedToUserId = command.AssignedToUserId,
                 Summary = command.Summary,
                 Description = command.Description,
                 Category = command.Category.ToString(),
                 Severity = command.Severity.ToString(),
                 Environment = command.Environment.ToString(),
+                CreatedAt = DateTime.UtcNow,
+                Status = command.Status.ToString(),
                 Version = command.Version
             };
 
@@ -29,7 +30,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplica
             var possibleDuplicates = Process.ExtractSorted(
                 newDefect,
                 projectDefects,
-                d => $"{d.Summary} {d.Description} {d.Category} {d.Severity} {d.Environment} {d.Version}"
+                d => $"{d.Summary} {d.Description}"
             );
 
             var duplicates = possibleDuplicates
@@ -38,13 +39,14 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplica
                 {
                     DefectId = d.Value.DefectId,
                     ProjectId = d.Value.ProjectId,
-                    AssignedToUserId = d.Value.AssignedToUserId,
                     Summary = d.Value.Summary,
                     Description = d.Value.Description,
                     Category = d.Value.Category,
                     Severity = d.Value.Severity,
                     Environment = d.Value.Environment,
                     Version = d.Value.Version,
+                    CreatedAt = d.Value.CreatedAt,
+                    Status = d.Value.Status,
                     Score = d.Score
                 })
                 .ToList();
