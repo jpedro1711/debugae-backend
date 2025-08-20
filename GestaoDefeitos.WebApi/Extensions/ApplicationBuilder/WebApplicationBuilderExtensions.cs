@@ -92,6 +92,7 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
                 options.SlidingExpiration = true;
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.HttpOnly = false;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
                 options.LoginPath = string.Empty;
                 options.AccessDeniedPath = string.Empty;
 
