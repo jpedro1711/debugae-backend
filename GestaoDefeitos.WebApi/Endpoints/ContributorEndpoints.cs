@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Application.UseCases.ContributorUseCases.GetCurrentContributor;
+﻿using GestaoDefeitos.Application.UseCases.ContributorUseCases.GetAllContributors;
+using GestaoDefeitos.Application.UseCases.ContributorUseCases.GetCurrentContributor;
 using GestaoDefeitos.Application.UseCases.ContributorUseCases.Register;
 using GestaoDefeitos.Domain.Entities;
 using MediatR;
@@ -16,6 +17,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapGetContributorEndpoint();
             group.MapCreateContributorEndpoint();
             group.MapLogoutContributorEndpoint();
+            group.MapGetAllContributorsEndpoint();
 
             return endpoints;
         }
@@ -58,6 +60,19 @@ namespace GestaoDefeitos.WebApi.Endpoints
                     : Results.BadRequest("Failed to create contributor.");
             
             });
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapGetAllContributorsEndpoint(this RouteGroupBuilder group)
+        {
+            group.MapGet("/getAllContributors", async (IMediator mediator) =>
+            {
+                var query = new GetAllContributorsQuery();
+                var result = await mediator.Send(query);
+                return (result is not null) ? Results.Ok(result) : Results.NotFound("Failed to fetch contributors.");
+            })
+            .RequireAuthorization();
 
             return group;
         }

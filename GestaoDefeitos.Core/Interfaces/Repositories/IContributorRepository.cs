@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.ViewModels;
 
 namespace GestaoDefeitos.Domain.Interfaces.Repositories
 {
@@ -6,5 +7,6 @@ namespace GestaoDefeitos.Domain.Interfaces.Repositories
     {
         Task<List<Contributor>> GetContributorsByIdsAsync(List<string> contributorIds);
         Task<Contributor?> GetContributorByEmailAsync(string email);
+        Task<List<ColaboratorViewModel>> GetAllColaborators();
     }
 }

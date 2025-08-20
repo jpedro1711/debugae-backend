@@ -1,5 +1,6 @@
 ﻿using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
+using GestaoDefeitos.Domain.ViewModels;
 using GestaoDefeitos.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,15 @@ namespace GestaoDefeitos.Infrastructure.Repositories
             return await _context.Users
                 .Where(c => contributorIds.Contains(c.Id.ToString()))
                 .ToListAsync();
+        }
+
+        public async Task<List<ColaboratorViewModel>> GetAllColaborators()
+        {
+            return await _context
+                    .Users
+                    .Select(c => new ColaboratorViewModel
+                    (c.Id, c.FullName, c.Email))
+                    .ToListAsync();
         }
 
         public async Task<Contributor?> GetContributorByEmailAsync(string email)
