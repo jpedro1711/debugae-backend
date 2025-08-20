@@ -90,13 +90,12 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
                 options.Cookie.Name = "auth_cookie";
                 options.ExpireTimeSpan = TimeSpan.FromHours(1);
                 options.SlidingExpiration = true;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.HttpOnly = false;
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.HttpOnly = true; 
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.LoginPath = string.Empty;
                 options.AccessDeniedPath = string.Empty;
-                options.Cookie.Domain = null;
-                options.Cookie.IsEssential = true;
+
                 options.Events.OnRedirectToLogin = context =>
                 {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
