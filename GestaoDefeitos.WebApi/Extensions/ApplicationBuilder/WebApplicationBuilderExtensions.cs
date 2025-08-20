@@ -92,8 +92,10 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
                 options.SlidingExpiration = true;
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.HttpOnly = false;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.LoginPath = string.Empty;
                 options.AccessDeniedPath = string.Empty;
+                options.Cookie.Domain = null;
 
                 options.Events.OnRedirectToLogin = context =>
                 {
@@ -152,11 +154,6 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
             webApplication.MapControllers();
 
             webApplication.MapIdentityApi<Contributor>();
-
-            webApplication.UseCookiePolicy(new CookiePolicyOptions
-            {
-                Secure = CookieSecurePolicy.SameAsRequest
-            });
 
             return webApplication;
         }
