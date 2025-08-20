@@ -9,7 +9,6 @@ using GestaoDefeitos.Infrastructure.Repositories;
 using GestaoDefeitos.WebApi.Endpoints;
 using GestaoDefeitos.WebApi.Extensions.Migrations;
 using GestaoDefeitos.WebApi.Middleware;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -93,7 +92,6 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
                 options.SlidingExpiration = true;
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.HttpOnly = false;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.LoginPath = string.Empty;
                 options.AccessDeniedPath = string.Empty;
 
@@ -155,11 +153,10 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
 
             webApplication.MapIdentityApi<Contributor>();
 
-            webApplication.UseForwardedHeaders(new ForwardedHeadersOptions
+            webApplication.UseCookiePolicy(new CookiePolicyOptions
             {
-                ForwardedHeaders = ForwardedHeaders.XForwardedProto
+                Secure = CookieSecurePolicy.SameAsRequest
             });
-
 
             return webApplication;
         }
