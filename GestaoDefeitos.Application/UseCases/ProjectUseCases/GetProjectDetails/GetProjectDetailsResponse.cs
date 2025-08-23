@@ -9,9 +9,12 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
             DateTime CreatedAt,
             int TotalColaborators,
             int TotalDefects,
-            int TotalDefectsOpen,
-            int TotalDefectsInProgress,
-            int TotalDefectsResolved,
+            int TotalOpen,
+            int TotalClosed,
+            int TotalResolved,
+            int TotalInvalid,
+            int TotalReopened,
+            int TotalWaitingForUser,
             List<ProjectColaboratorViewModel> Colaborators,
             List<DefectsSimplifiedViewModel> Defects
         );

@@ -18,23 +18,29 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
             if (projectDetails is null)
                 return null;
 
-            (int totalOpen, int totalInProgress, int totalResolved) = GetDefectCountByStatus(projectDetails.Defects);
+            (int totalOpen, int totalClosed, int totalResolved, int totalInvalid, int totalReopened, int totalWaitingForUser) = GetDefectCountByStatus(projectDetails.Defects);
 
             var response = CreateProjectDetailsResponse(
                 projectDetails,
                 totalOpen,
-                totalInProgress,
-                totalResolved
+                totalClosed,
+                totalResolved,
+                totalInvalid,
+                totalReopened,
+                totalWaitingForUser
             );
 
             return response;
         }
 
         private static GetProjectDetailsResponse CreateProjectDetailsResponse(
-            Project project, 
-            int totalDefectsOpen, 
-            int totalDefectsInProgress, 
-            int totalDefectsResolved
+            Project project,
+            int totalOpen,
+            int totalClosed,
+            int totalResolved,
+            int totalInvalid,
+            int totalReopened,
+            int totalWaitingForUser
             )
         {
             return new GetProjectDetailsResponse(
@@ -44,9 +50,12 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
                     project.CreatedAt,
                     project.ProjectContributors.Count,
                     project.Defects.Count,
-                    totalDefectsOpen,
-                    totalDefectsInProgress,
-                    totalDefectsResolved,
+                    totalOpen,
+                    totalClosed,
+                    totalResolved,
+                    totalInvalid,
+                    totalReopened,
+                    totalWaitingForUser,
                     project.ProjectContributors.Select(pc => new ProjectColaboratorViewModel(
                         pc.Contributor.Id,
                         pc.Contributor.Firstname + " " + pc.Contributor.Lastname,
@@ -65,13 +74,16 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
                 );
         }
 
-        private static (int totalOpen, int totalClosed, int totalResolved) GetDefectCountByStatus(List<Defect> defects)
+        private static (int totalOpen, int totalClosed, int totalResolved, int totalInvalid, int totalReopened, int totalWaitingForUser) GetDefectCountByStatus(List<Defect> defects)
         {
-            var totalOpen = defects.Count(d => d.Status == DefectStatus.New);
-            var totalClosed = defects.Count(d => d.Status == DefectStatus.InProgress);
+            var totalNew = defects.Count(d => d.Status == DefectStatus.New);
+            var totalInProgress = defects.Count(d => d.Status == DefectStatus.InProgress);
             var totalResolved = defects.Count(d => d.Status == DefectStatus.Resolved);
+            var totalInvalid = defects.Count(d => d.Status == DefectStatus.Invalid);
+            var totalReopened = defects.Count(d => d.Status == DefectStatus.Reopened);
+            var totalWaitingForUser = defects.Count(d => d.Status == DefectStatus.Reopened);
 
-            return (totalOpen, totalClosed, totalResolved);
+            return (totalNew, totalInProgress, totalResolved, totalInvalid, totalReopened, totalWaitingForUser);
         }
     }
 }
