@@ -69,7 +69,14 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
                         d.Status.ToString(),
                         d.DefectPriority.ToString(),
                         d.ExpiresIn,
-                        d.CreatedAt
+                        d.CreatedAt,
+                        d.DefectCategory.ToString(),
+                        new ProjectSimplifiedViewModel(
+                            project.Id,
+                            project.Name,
+                            project.Description,
+                            project.CreatedAt
+                        )
                     )).ToList()
                 );
         }

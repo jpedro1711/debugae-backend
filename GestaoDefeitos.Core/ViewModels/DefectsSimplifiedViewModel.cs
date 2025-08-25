@@ -1,6 +1,4 @@
-﻿using GestaoDefeitos.Domain.Enums;
-
-namespace GestaoDefeitos.Domain.ViewModels
+﻿namespace GestaoDefeitos.Domain.ViewModels
 {
     public record DefectsSimplifiedViewModel(
             Guid Id,
@@ -9,6 +7,8 @@ namespace GestaoDefeitos.Domain.ViewModels
             string Status,
             string DefectPriority,
             DateTime ExpirationDate,
-            DateTime CreatedAt
+            DateTime CreatedAt,
+            string Category,
+            ProjectSimplifiedViewModel Project
         );
 }

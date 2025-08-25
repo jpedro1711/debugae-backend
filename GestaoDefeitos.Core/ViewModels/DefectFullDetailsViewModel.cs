@@ -17,6 +17,7 @@
         DefectAttachmentViewModel? Attachment,
         IEnumerable<DefectsSimplifiedViewModel>? RelatedDefects,
         IEnumerable<DefectHistoryViewModel>? History,
-        IEnumerable<TrelloUserStoryViewModel> TrelloUserStories
+        IEnumerable<TrelloUserStoryViewModel> TrelloUserStories,
+        string LogStackTrace
     );
 }
