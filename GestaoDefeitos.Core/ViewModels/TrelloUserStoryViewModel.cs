@@ -4,6 +4,7 @@
     (
        string? Desc,
        string? ShortUrl,
+       string? Name,
        Guid DefectId
     );
 }

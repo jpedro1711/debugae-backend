@@ -11,7 +11,7 @@ namespace GestaoDefeitos.Application.TrelloIntegration
         Task<TrelloUserStory> AddCommentAsync(string userId, string cardId, string comment, Guid defectId);
         void StoreAccessToken(string userId, string token, string tokenSecret);
         bool TryGetAccessToken(string userId, out (string token, string tokenSecret) tokenData);
-        Task<string> GetLoginRedirectUrlAsync();
+        Task<string> GetLoginRedirectUrlAsync(string returnUrl);
         Task<bool> HandleCallbackAsync(string oauth_token, string oauth_verifier, string userId);
     }
 }

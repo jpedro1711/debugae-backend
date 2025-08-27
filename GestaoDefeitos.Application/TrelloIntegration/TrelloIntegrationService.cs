@@ -84,6 +84,7 @@ namespace GestaoDefeitos.Application.TrelloIntegration
                 Id = Guid.NewGuid(),
                 Desc = trelloUserStoryViewModel?.Description,
                 ShortUrl = trelloUserStoryViewModel?.Url,
+                Name = trelloUserStoryViewModel?.Name,
                 DefectId = defectId
             };
 
@@ -92,7 +93,7 @@ namespace GestaoDefeitos.Application.TrelloIntegration
             return userStory;
         }
 
-        public async Task<string> GetLoginRedirectUrlAsync()
+        public async Task<string> GetLoginRedirectUrlAsync(string returnUrl)
         {
             var oauth = new OAuthRequest
             {
@@ -100,7 +101,7 @@ namespace GestaoDefeitos.Application.TrelloIntegration
                 RequestUrl = _options.OAuthGetRequestTokenUrl,
                 ConsumerKey = _options.ConsumerKey,
                 ConsumerSecret = _options.ConsumerSecret,
-                CallbackUrl = _options.CallbackUrl
+                CallbackUrl = $"{_options.CallbackUrl}?returnUrl={Uri.EscapeDataString(returnUrl)}"
             };
 
             using var client = new HttpClient();
@@ -116,7 +117,7 @@ namespace GestaoDefeitos.Application.TrelloIntegration
 
             _cache.StoreRequestToken(token!, tokenSecret!);
 
-            var authorizeUrl = $"{_options.OAuthAuthorizeTokenUrl}?oauth_token={token}&name=DefectManager&scope=read,write&expiration=never";
+            var authorizeUrl = $"{_options.OAuthAuthorizeTokenUrl}?oauth_token={token}&name=DefectManager&scope=read,write&expiration=never&returnUrl={returnUrl}";
             return authorizeUrl;
         }
 

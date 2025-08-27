@@ -6,6 +6,8 @@ namespace GestaoDefeitos.Application.TrelloIntegration.Responses
     {
         [JsonPropertyName("id")]
         public string? Id { get; set; }
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
 
         [JsonPropertyName("desc")]
         public string? Description{ get; set; }

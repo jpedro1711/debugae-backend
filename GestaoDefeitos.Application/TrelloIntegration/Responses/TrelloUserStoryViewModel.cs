@@ -9,6 +9,8 @@ namespace GestaoDefeitos.Application.TrelloIntegration.Responses
 
         [JsonPropertyName("desc")]
         public string? Description { get; set; }
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
 
         [JsonPropertyName("shortUrl")]
         public string? Url { get; set; }

@@ -192,6 +192,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         d.TrelloUserStories.Select(ts => new TrelloUserStoryViewModel(
                             ts.Desc,
                             ts.ShortUrl,
+                            ts.Name,
                             ts.DefectId
                         )),
                         d.ErrorLog

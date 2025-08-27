@@ -10,22 +10,22 @@ namespace GestaoDefeitos.WebApi.Endpoints.TrelloIntegration;
 public class TrelloController(AuthenticationContextAcessor _authenticationContextAcessor, ITrelloIntegrationService _trelloIntegrationService) : ControllerBase
 {
     [HttpGet("login")]
-    public async Task<IActionResult> Login()
+    public async Task<IActionResult> Login([FromQuery] string returnUrl = "/")
     {
-        var redirectUrl = await _trelloIntegrationService.GetLoginRedirectUrlAsync();
+        var redirectUrl = await _trelloIntegrationService.GetLoginRedirectUrlAsync(returnUrl);
         return Redirect(redirectUrl);
     }
 
     [HttpGet("callback")]
-    public async Task<IActionResult> Callback([FromQuery] string oauth_token, [FromQuery] string oauth_verifier)
+    public async Task<IActionResult> Callback([FromQuery] string oauth_token, [FromQuery] string oauth_verifier, [FromQuery] string returnUrl)
     {
         var userId = _authenticationContextAcessor.GetCurrentLoggedUserId().ToString();
         var success = await _trelloIntegrationService.HandleCallbackAsync(oauth_token, oauth_verifier, userId);
 
         if (!success)
-            return BadRequest("Token desconhecido ou erro na autenticação.");
+            return Redirect(returnUrl + "?isAuthenticated=false");
 
-        return Ok("Autenticado com sucesso.");
+        return Redirect(returnUrl + "?isAuthenticated=true");
     }
 
     [HttpGet("workspaces")]
