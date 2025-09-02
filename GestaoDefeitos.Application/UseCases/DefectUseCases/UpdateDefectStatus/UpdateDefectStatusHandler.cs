@@ -24,13 +24,6 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
 
             var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
 
-            defect.Status = request.NewStatus;
-
-            var updatedDefect = await defectRepository.UpdateAsync(defect);
-
-            if (updatedDefect is null)
-                return null;
-
             await mediator.Publish(new DefectChangeNotification
             {
                 DefectId = defect.Id,
@@ -42,6 +35,13 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             }, cancellationToken);
+
+            defect.Status = request.NewStatus;
+
+            var updatedDefect = await defectRepository.UpdateAsync(defect);
+
+            if (updatedDefect is null)
+                return null;
 
             if (loggedUserId != defect.AssignedToContributorId)
                 await SaveUserNotification(defect.AssignedToContributorId, contributorNotificationRepository, updatedDefect.Id);
