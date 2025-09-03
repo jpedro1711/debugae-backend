@@ -19,7 +19,7 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject
             var projectExists = await projectRepository.GetProjectByName(command.ProjectName, cancellationToken);
 
             if (projectExists != null)
-                throw new InvalidOperationException("Project with the same name already exists.");
+                throw new InvalidOperationException("Projeto já existe com esse nome, tente com outro nome.");
 
             var project = new Project
             {
@@ -47,7 +47,7 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject
                 }
                 else
                 {
-                    throw new InvalidOperationException("User not found: " + contributorEmail);
+                    throw new InvalidOperationException("Usuário não encontrado: " + contributorEmail);
                 }
             }
 
