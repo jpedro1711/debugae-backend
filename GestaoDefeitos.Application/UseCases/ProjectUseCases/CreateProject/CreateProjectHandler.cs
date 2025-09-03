@@ -16,6 +16,11 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject
     {
         public async Task<CreateProjectResponse?> Handle(CreateProjectCommand command, CancellationToken cancellationToken)
         {
+            var projectExists = await projectRepository.GetProjectByName(command.ProjectName, cancellationToken);
+
+            if (projectExists != null)
+                throw new InvalidOperationException("Project with the same name already exists.");
+
             var project = new Project
             {
                 Name = command.ProjectName,

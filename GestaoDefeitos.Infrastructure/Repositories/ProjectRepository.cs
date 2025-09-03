@@ -17,5 +17,9 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 .Include(project => project.Defects)
                 .SingleOrDefaultAsync(cancellationToken);
         }
+
+        public async Task<Project?> GetProjectByName(string projectName, CancellationToken cancellationToken) =>
+            await _context.Projects
+                .FirstOrDefaultAsync(project => project.Name == projectName, cancellationToken);
     }
 }
