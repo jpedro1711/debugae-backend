@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GestaoDefeitos.Infrastructure.Repositories
 {
-    public class ContributorNotificationRepository(AppDbContext context)         
+    public class ContributorNotificationRepository(AppDbContext context)
         : BaseRepository<ContributorNotification>(context), IContributorNotificationRepository
     {
         public async Task<List<ContributorNotification>> GetNotificationsByContributorIdAsync(Guid contributorId)

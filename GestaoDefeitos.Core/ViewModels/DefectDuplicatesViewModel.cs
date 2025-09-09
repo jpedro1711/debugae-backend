@@ -1,6 +1,4 @@
-﻿using GestaoDefeitos.Domain.Enums;
-
-namespace GestaoDefeitos.Domain.ViewModels
+﻿namespace GestaoDefeitos.Domain.ViewModels
 {
     public class DefectDuplicatesViewModel
     {

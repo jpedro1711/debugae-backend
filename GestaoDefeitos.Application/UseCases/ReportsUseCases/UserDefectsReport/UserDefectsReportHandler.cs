@@ -1,20 +1,21 @@
-﻿using GestaoDefeitos.Domain.Enums;
+﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Domain.ViewModels.DefectsReport;
 using MediatR;
 
-namespace GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport
+namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
 {
-    public class ProjectDefectsReportHandler
-        (
-            IDefectRepository defectRepository
-        ) : IRequestHandler<ProjectDefectsReportQuery, ProjectDefectsReportResponse?>
+    public class UserDefectsReportHandler(
+            IDefectRepository defectRepository,
+            AuthenticationContextAcessor authenticationContextAcessor
+        ) : IRequestHandler<UserDefectsReportQuery, UserDefectsReportResponse?>
     {
-        public async Task<ProjectDefectsReportResponse?> Handle(
-            ProjectDefectsReportQuery request,
-            CancellationToken cancellationToken)
+        public async Task<UserDefectsReportResponse?> Handle(UserDefectsReportQuery request, CancellationToken cancellationToken)
         {
-            var defectsData = await defectRepository.GetDefectsDataByProjectIdAsync(request.ProjectId);
+            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
+
+            var defectsData = await defectRepository.GetDefectsDataByContributorIdAsync(loggedUserId);
 
             var metrics = new DefectMetricsViewModel
             {
@@ -61,13 +62,14 @@ namespace GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport
                 .ToList();
 
             var timelineData = last7Days
-                .Select(date => new {
+                .Select(date => new
+                {
                     date,
                     defects = groupedByDate.TryGetValue(date, out var count) ? count : 0
                 })
                 .ToList();
 
-            return new ProjectDefectsReportResponse
+            return new UserDefectsReportResponse
             {
                 Metrics = metrics,
                 StatusData = statusData,

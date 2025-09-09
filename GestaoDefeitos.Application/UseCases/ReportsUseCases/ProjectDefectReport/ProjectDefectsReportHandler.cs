@@ -1,21 +1,20 @@
-﻿using GestaoDefeitos.Application.Utils;
-using GestaoDefeitos.Domain.Enums;
+﻿using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Domain.ViewModels.DefectsReport;
 using MediatR;
 
-namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
+namespace GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport
 {
-    public class UserDefectsReportHandler(
-            IDefectRepository defectRepository,
-            AuthenticationContextAcessor authenticationContextAcessor
-        ) : IRequestHandler<UserDefectsReportQuery, UserDefectsReportResponse?>
+    public class ProjectDefectsReportHandler
+        (
+            IDefectRepository defectRepository
+        ) : IRequestHandler<ProjectDefectsReportQuery, ProjectDefectsReportResponse?>
     {
-        public async Task<UserDefectsReportResponse?> Handle(UserDefectsReportQuery request, CancellationToken cancellationToken)
+        public async Task<ProjectDefectsReportResponse?> Handle(
+            ProjectDefectsReportQuery request,
+            CancellationToken cancellationToken)
         {
-            var loggedUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
-
-            var defectsData = await defectRepository.GetDefectsDataByContributorIdAsync(loggedUserId);
+            var defectsData = await defectRepository.GetDefectsDataByProjectIdAsync(request.ProjectId);
 
             var metrics = new DefectMetricsViewModel
             {
@@ -30,7 +29,7 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
                 .Cast<DefectStatus>()
                 .Select(status => new DefectByStatusViewModel
                 {
-                    Name = status.ToString(), 
+                    Name = status.ToString(),
                     Value = defectsData.Count(d => d.Status == status)
                 })
                 .ToList();
@@ -62,13 +61,14 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
                 .ToList();
 
             var timelineData = last7Days
-                .Select(date => new {
+                .Select(date => new
+                {
                     date,
                     defects = groupedByDate.TryGetValue(date, out var count) ? count : 0
                 })
                 .ToList();
 
-            return new UserDefectsReportResponse
+            return new ProjectDefectsReportResponse
             {
                 Metrics = metrics,
                 StatusData = statusData,

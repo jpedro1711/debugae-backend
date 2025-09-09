@@ -24,7 +24,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag
             if (existingTag is not null)
             {
                 await tagRepository.DeleteAsync(existingTag.Id);
-                return new AddOrRemoveTagResponse(defect.Id ,Guid.Empty);
+                return new AddOrRemoveTagResponse(defect.Id, Guid.Empty);
             }
 
             // If the tag does not exist, we create a new one

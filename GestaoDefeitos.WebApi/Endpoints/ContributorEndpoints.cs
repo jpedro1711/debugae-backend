@@ -55,10 +55,10 @@ namespace GestaoDefeitos.WebApi.Endpoints
             {
                 var id = await mediator.Send(command);
 
-                return (id is not null) 
+                return (id is not null)
                     ? Results.Created($"/contributors/{id.ContributorId}", id)
                     : Results.BadRequest("Failed to create contributor.");
-            
+
             });
 
             return group;

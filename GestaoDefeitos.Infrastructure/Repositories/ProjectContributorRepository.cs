@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GestaoDefeitos.Infrastructure.Repositories
 {
     public class ProjectContributorRepository(AppDbContext context)
-        : BaseRepository<ProjectContributor>(context), 
+        : BaseRepository<ProjectContributor>(context),
           IProjectContributorRepository
     {
         public async Task<PagedResult<UsersProjectViewModel>> GetProjectContributorsByUserIdAsync(Guid userId, int page, int pageSize)

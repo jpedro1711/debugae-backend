@@ -34,7 +34,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplica
             );
 
             var duplicates = possibleDuplicates
-                .Where(d => d.Score >= 60) 
+                .Where(d => d.Score >= 60)
                 .Select(d => new DefectDuplicatesViewModel
                 {
                     DefectId = d.Value.DefectId,

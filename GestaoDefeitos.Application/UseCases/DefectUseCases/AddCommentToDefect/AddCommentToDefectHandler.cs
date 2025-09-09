@@ -10,7 +10,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddCommentToDefect
             IDefectRepository defectRepository,
             IDefectCommentRepository defectCommentRepository,
             AuthenticationContextAcessor authenticationContextAcessor
-        ) : IRequestHandler<AddCommentToDefectCommand, AddCommentToDefectResponse?> 
+        ) : IRequestHandler<AddCommentToDefectCommand, AddCommentToDefectResponse?>
     {
         public async Task<AddCommentToDefectResponse?> Handle(AddCommentToDefectCommand command, CancellationToken cancellationToken)
         {

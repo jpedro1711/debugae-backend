@@ -17,7 +17,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
 
             var response = defectFullDetails with { History = defectHistory };
 
-            return new GetDefectDetailsResponse(response); 
+            return new GetDefectDetailsResponse(response);
         }
     }
 }

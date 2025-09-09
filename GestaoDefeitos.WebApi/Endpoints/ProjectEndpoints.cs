@@ -16,7 +16,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             var group = endpoints.MapGroup("/projects")
                 .WithTags("Projects");
 
-            group.MapCreateProjectEndpoint(); 
+            group.MapCreateProjectEndpoint();
             group.MapGetUserProjects();
             group.MapGetProjectDetails();
             group.MapManageContributorstEndpoint();
@@ -114,7 +114,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
 
         public static RouteGroupBuilder MapUpdateProject(this RouteGroupBuilder group)
         {
-            group.MapPatch("/updateProject", async(
+            group.MapPatch("/updateProject", async (
                 [FromBody] UpdateProjectRequest request,
                 IMediator mediator) =>
             {

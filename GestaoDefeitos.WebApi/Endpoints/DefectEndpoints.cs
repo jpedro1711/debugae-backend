@@ -82,7 +82,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 ) =>
             {
                 var userDefects = await mediator.Send(new GetUserDefectsQuery(page, pageSize));
-                
+
                 return (userDefects is not null)
                     ? Results.Ok(userDefects)
                     : Results.BadRequest("Failed to fetch user defects.");

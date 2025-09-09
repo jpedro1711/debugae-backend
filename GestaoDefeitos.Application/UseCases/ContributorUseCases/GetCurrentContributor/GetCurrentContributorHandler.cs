@@ -11,7 +11,7 @@ namespace GestaoDefeitos.Application.UseCases.ContributorUseCases.GetCurrentCont
             var userId = httpContextAccessor.GetCurrentLoggedUserId();
 
             var user = await repository.GetByIdAsync(userId);
-        
+
             return new GetCurrentContributorResponse(
                 user?.Id ?? Guid.Empty,
                 user?.Firstname ?? string.Empty,

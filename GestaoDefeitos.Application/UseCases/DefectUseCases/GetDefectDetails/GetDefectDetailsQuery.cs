@@ -1,5 +1,4 @@
-﻿using GestaoDefeitos.Domain.Entities;
-using MediatR;
+﻿using MediatR;
 
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails
 {

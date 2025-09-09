@@ -10,7 +10,7 @@ namespace GestaoDefeitos.Application.Utils
             var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (Guid.TryParse(userIdClaim, out var userId))
                 return userId;
-            
+
             throw new InvalidOperationException("User ID not found in the current context or is not a valid GUID.");
         }
 

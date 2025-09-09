@@ -1,5 +1,5 @@
-﻿using System.Net.Mime;
-using System.Net;
+﻿using System.Net;
+using System.Net.Mime;
 using System.Text.Json;
 
 namespace GestaoDefeitos.WebApi.Middleware

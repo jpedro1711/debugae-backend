@@ -8,11 +8,11 @@
 
   <ItemGroup>
     <Compile Remove="Mappings\**" />
-    <Compile Remove="UseCases\Notifications\NewFolder\**" />
+    <Compile Remove="UseCases\NotificationsUseCases\NewFolder\**" />
     <EmbeddedResource Remove="Mappings\**" />
-    <EmbeddedResource Remove="UseCases\Notifications\NewFolder\**" />
+    <EmbeddedResource Remove="UseCases\NotificationsUseCases\NewFolder\**" />
     <None Remove="Mappings\**" />
-    <None Remove="UseCases\Notifications\NewFolder\**" />
+    <None Remove="UseCases\NotificationsUseCases\NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>

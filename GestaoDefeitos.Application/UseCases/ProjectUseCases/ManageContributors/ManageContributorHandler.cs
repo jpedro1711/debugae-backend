@@ -1,9 +1,9 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.Utils;
+using GestaoDefeitos.Domain.Entities;
+using GestaoDefeitos.Domain.Enums;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using GestaoDefeitos.Domain.Enums;
-using GestaoDefeitos.Application.Utils;
 
 namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.ManageContributors
 {
@@ -20,7 +20,7 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.ManageContributors
             var project = await projectRepository.GetByIdAsync(request.ProjectId)
                                 ?? throw new InvalidOperationException("Project not found. Please check the project ID.");
 
-            var currentLoggedUserProjectData = await projectContributorRepository.GetByProjectAndUserIds(project.Id ,authenticationContextAcessor.GetCurrentLoggedUserId()) 
+            var currentLoggedUserProjectData = await projectContributorRepository.GetByProjectAndUserIds(project.Id, authenticationContextAcessor.GetCurrentLoggedUserId())
                                 ?? throw new InvalidOperationException("Unable to retrieve logged user ID");
 
             if (!currentLoggedUserProjectData.Role.Equals(ProjectRole.Administrator))

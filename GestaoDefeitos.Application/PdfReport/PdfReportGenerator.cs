@@ -104,10 +104,10 @@ namespace GestaoDefeitos.Application.PdfReport
                             {
                                 table.ColumnsDefinition(columns =>
                                 {
-                                    columns.ConstantColumn(30);    
-                                    columns.RelativeColumn(3);     
-                                    columns.RelativeColumn(2);     
-                                    columns.RelativeColumn(2);     
+                                    columns.ConstantColumn(30);
+                                    columns.RelativeColumn(3);
+                                    columns.RelativeColumn(2);
+                                    columns.RelativeColumn(2);
                                 });
 
                                 table.Header(header =>

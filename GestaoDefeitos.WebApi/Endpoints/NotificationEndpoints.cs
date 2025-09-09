@@ -1,6 +1,5 @@
 ﻿using GestaoDefeitos.Application.UseCases.Notifications.GetCurrentLoggedUserNotifications;
 using GestaoDefeitos.Application.UseCases.Notifications.MarkNotificationAsRead;
-using GestaoDefeitos.Application.UseCases.ProjectUseCases.CreateProject;
 using MediatR;
 
 namespace GestaoDefeitos.WebApi.Endpoints

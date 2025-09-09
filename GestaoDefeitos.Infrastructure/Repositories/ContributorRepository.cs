@@ -21,7 +21,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
             return await _context
                     .Users
                     .Select(c => new ColaboratorViewModel
-                    (c.Id, c.FullName, c.Email))
+                    (c.Id, c.FullName, c.Email!))
                     .ToListAsync();
         }
 

@@ -9,7 +9,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
 {
     public class UpdateDefectStatusHandler
         (
-            IDefectRepository defectRepository, 
+            IDefectRepository defectRepository,
             AuthenticationContextAcessor authenticationContextAcessor,
             IContributorNotificationRepository contributorNotificationRepository,
             IMediator mediator

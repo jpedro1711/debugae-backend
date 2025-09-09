@@ -5,7 +5,7 @@ using MediatR;
 namespace GestaoDefeitos.Application.UseCases.DefectUseCases.GetUserDefects
 {
     public class GetUserDefectsHandler(
-        IDefectRepository defectRepository, 
+        IDefectRepository defectRepository,
         AuthenticationContextAcessor authenticationContextAcessor
         ) : IRequestHandler<GetUserDefectsQuery, GetUserDefectsResponse>
     {

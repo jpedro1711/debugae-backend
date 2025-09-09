@@ -9,9 +9,9 @@ namespace GestaoDefeitos.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<DefectAttachment> builder)
         {
             builder
-            .HasOne(dr => dr.Defect)
-            .WithOne(d => d.Attachment)
-            .HasForeignKey<DefectAttachment>(dr => dr.DefectId);
+                .HasOne(dr => dr.Defect)
+                .WithOne(d => d.Attachment)
+                .HasForeignKey<DefectAttachment>(dr => dr.DefectId);
         }
     }
 }

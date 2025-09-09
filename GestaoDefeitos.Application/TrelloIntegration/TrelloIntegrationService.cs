@@ -39,7 +39,7 @@ namespace GestaoDefeitos.Application.TrelloIntegration
         public async Task<List<TrelloWorkspaceViewModel>> GetWorkspacesAsync(string userId)
         {
             var (token, secret) = EnsureToken(userId);
-            var result =  await TrelloGetAsync(_options.GetWorkspacesUrl, token, secret);
+            var result = await TrelloGetAsync(_options.GetWorkspacesUrl, token, secret);
             List<TrelloWorkspaceViewModel> workspaces = JsonSerializer.Deserialize<List<TrelloWorkspaceViewModel>>(result) ?? [];
             return workspaces;
         }

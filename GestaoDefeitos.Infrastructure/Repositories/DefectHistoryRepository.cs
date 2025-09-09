@@ -1,9 +1,9 @@
-﻿using GestaoDefeitos.Domain.Interfaces.Repositories;
-using GestaoDefeitos.Infrastructure.Database;
+﻿using GestaoDefeitos.Domain.Entities.Events;
 using GestaoDefeitos.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
-using GestaoDefeitos.Domain.Entities.Events;
+using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Domain.ViewModels;
+using GestaoDefeitos.Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace GestaoDefeitos.Infrastructure.Repositories
 {
