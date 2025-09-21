@@ -44,6 +44,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: debugae-artifact
+          path: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/debugae'
 
       - uses: azure/login@v2
         with:
