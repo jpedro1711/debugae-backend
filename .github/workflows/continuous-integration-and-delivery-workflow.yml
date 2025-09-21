@@ -43,7 +43,7 @@ jobs:
       - name: Download published artifact
         uses: actions/download-artifact@v5
         with:
-          name: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/debugae
+          name: debugae-artifact
 
       - uses: azure/login@v2
         with:
