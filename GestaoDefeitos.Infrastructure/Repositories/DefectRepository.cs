@@ -196,7 +196,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                             ts.DefectId
                         )),
                         d.ErrorLog,
-                        d.Tags.Select(t => t.Description)
+                        d.Tags.Select(t => t.Description),
+                        d.ProjectId
                     )).SingleAsync(cancellationToken);
         }
 

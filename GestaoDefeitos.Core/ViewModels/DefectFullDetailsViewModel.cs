@@ -19,6 +19,7 @@
         IEnumerable<DefectHistoryViewModel>? History,
         IEnumerable<TrelloUserStoryViewModel> TrelloUserStories,
         string LogStackTrace,
-        IEnumerable<string> Tags
+        IEnumerable<string> Tags,
+        Guid ProjectId
     );
 }

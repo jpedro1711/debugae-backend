@@ -3,6 +3,7 @@ using GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplicates;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.DownloadAttachment;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.EditDefect;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetAllDefectsFromUser;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectDetails;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.GetDefectsByProject;
@@ -30,6 +31,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapGetDefectDetails();
             group.MapDownloadDefectAttachment();
             group.MapGetAllDefectFromUser();
+            group.MapUpdateDefect();
 
             return endpoints;
         }
@@ -203,6 +205,22 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (userDefects is not null)
                     ? Results.Ok(userDefects)
                     : Results.BadRequest("Could not get current logged user defects");
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapUpdateDefect(this RouteGroupBuilder group)
+        {
+            group.MapPatch("/updateDefect", async (
+                EditDefectCommand command,
+                IMediator mediator) =>
+            {
+                var updatedDefect = await mediator.Send(command);
+
+                return (updatedDefect is not null)
+                    ? Results.Ok(updatedDefect)
+                    : Results.BadRequest("Failed to update defect.");
             }).RequireAuthorization();
 
             return group;
