@@ -55,7 +55,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
             {
                 Id = Guid.NewGuid(),
                 ContributorId = userId,
-                Content = $"Some of your defects had a status change - {defectId}",
+                Content = $"Um defeito mudou de status - {defectId}",
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow
             };

@@ -81,7 +81,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect
             {
                 Id = Guid.NewGuid(),
                 ContributorId = userId,
-                Content = $"You have a new defect assigned to you - {defectId}",
+                Content = $"Você tem um novo defeito assinalado ao seu usuário - {defectId}",
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow
             };
