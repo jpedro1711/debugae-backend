@@ -156,7 +156,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         d.DefectCategory.ToString(),
                         new DefectResponsibleContributorViewModel(
                             d.AssignedToContributor.Id,
-                            d.AssignedToContributor.FullName
+                            d.AssignedToContributor.FullName,
+                            d.AssignedToContributor.Email!
                         ),
                         new DefectDetailsViewModel(
                             d.Description,
