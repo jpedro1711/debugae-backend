@@ -36,7 +36,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
 
         public static RouteGroupBuilder MapGetUserNotifications(this RouteGroupBuilder group)
         {
-            group.MapPost("/getCurrentNotifications", async (
+            group.MapGet("/getCurrentNotifications", async (
                 IMediator mediator) =>
             {
                 var userNotifications = await mediator.Send(new GetCurrentLoggedUserNotificationsQuery());
