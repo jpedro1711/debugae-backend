@@ -29,5 +29,10 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 await context.SaveChangesAsync();
             }
         }
+
+        public async Task<DefectMailLetter?> GetByCompositeIdAsync(Guid DefectId, Guid ContributorId)
+        {
+            return await context.DefectMailLetters.FirstOrDefaultAsync(x => x.DefectId == DefectId && x.ContributorId == ContributorId);
+        }
     }
 }

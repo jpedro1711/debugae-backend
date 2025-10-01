@@ -6,8 +6,6 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveCurrentU
 {
     public class AddCurrentUserToMailLetterHandler(
             AuthenticationContextAcessor authenticationContextAcessor,
-            IDefectRepository defectRepository,
-            IContributorRepository contributorRepository,
             IDefectMailLetterRepository defectMailLetterRepository
         ) 
         : IRequestHandler<AddCurrentUserToMailLetterRequest, AddCurrentUserToMailLetterResponse?>
@@ -18,20 +16,18 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveCurrentU
             )
         {
             var currentUserId = authenticationContextAcessor.GetCurrentLoggedUserId();
-            var defect = await defectRepository.GetByIdAsync(request.DefectId) ?? throw new InvalidOperationException("Defeito não existe.");
+            var defectMailLetter = await defectMailLetterRepository.GetByCompositeIdAsync(request.DefectId, currentUserId);
             
-            if (defect.ContributorMailLetter.Any(c => c.ContributorId == currentUserId))
+            if (defectMailLetter is not null)
             {
-                await defectMailLetterRepository.RemoveFromMailLetter(defect.Id, currentUserId);
+                await defectMailLetterRepository.RemoveFromMailLetter(request.DefectId, currentUserId);
             }
             else
             {
-                await defectMailLetterRepository.AddToMailLetter(defect.Id, currentUserId);
+                await defectMailLetterRepository.AddToMailLetter(request.DefectId, currentUserId);
             }
 
-            await defectRepository.UpdateAsync(defect);
-
-            return new AddCurrentUserToMailLetterResponse(currentUserId, defect.Id);
+            return new AddCurrentUserToMailLetterResponse(currentUserId, request.DefectId);
         }
     }
 }
