@@ -137,7 +137,7 @@ namespace GestaoDefeitos.Infrastructure.Repositories
             return new PagedResult<DefectsSimplifiedViewModel>(items, totalCount, page, pageSize);
         }
 
-        public async Task<DefectFullDetailsViewModel> GetDefectDetails(Guid defectId, CancellationToken cancellationToken)
+        public async Task<DefectFullDetailsViewModel> GetDefectDetails(Guid defectId, Guid currentLoggedUserId, CancellationToken cancellationToken)
         {
             return await _context
                     .Defects
@@ -198,7 +198,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         )),
                         d.ErrorLog,
                         d.Tags.Select(t => t.Description),
-                        d.ProjectId
+                        d.ProjectId,
+                        d.ContributorMailLetter.Any(c => c.ContributorId == currentLoggedUserId)
                     )).SingleAsync(cancellationToken);
         }
 

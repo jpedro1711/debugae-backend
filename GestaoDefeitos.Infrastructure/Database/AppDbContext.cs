@@ -32,6 +32,7 @@ namespace GestaoDefeitos.Infrastructure.Database
         public DbSet<DefectAttachment> DefectAttachments { get; set; }
         public DbSet<DefectRelation> DefectRelations { get; set; }
         public DbSet<TrelloUserStory> TrelloUserStories { get; set; }
+        public DbSet<DefectMailLetter> DefectMailLetters { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -43,6 +44,8 @@ namespace GestaoDefeitos.Infrastructure.Database
             builder.ApplyConfiguration(new DefectCommentConfiguration());
             builder.ApplyConfiguration(new TrelloUserStoryConfiguration());
             builder.ApplyConfiguration(new DefectAttachmentConfiguration());
+            builder.ApplyConfiguration(new DefectConfiguration());
+            builder.ApplyConfiguration(new DefectMailLetterConfiguration());
         }
     }
 }

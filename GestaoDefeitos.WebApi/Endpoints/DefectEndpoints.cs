@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.AddCommentToDefect;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveCurrentUserToMailLetter;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.CreateDefect;
 using GestaoDefeitos.Application.UseCases.DefectUseCases.DetectDefectDuplicates;
@@ -32,6 +33,7 @@ namespace GestaoDefeitos.WebApi.Endpoints
             group.MapDownloadDefectAttachment();
             group.MapGetAllDefectFromUser();
             group.MapUpdateDefect();
+            group.MapAddOrRemoveCurrentUserToDefectMailLetter();
 
             return endpoints;
         }
@@ -221,6 +223,22 @@ namespace GestaoDefeitos.WebApi.Endpoints
                 return (updatedDefect is not null)
                     ? Results.Ok(updatedDefect)
                     : Results.BadRequest("Failed to update defect.");
+            }).RequireAuthorization();
+
+            return group;
+        }
+
+        public static RouteGroupBuilder MapAddOrRemoveCurrentUserToDefectMailLetter(this RouteGroupBuilder group)
+        {
+            group.MapPatch("/addOrRemoveToMailLetter", async (
+                AddCurrentUserToMailLetterRequest request,
+                IMediator mediator) =>
+            {
+                var result = await mediator.Send(request);
+
+                return (result is not null)
+                    ? Results.Ok(result)
+                    : Results.BadRequest("Failed to add or remove current user to mail letter.");
             }).RequireAuthorization();
 
             return group;

@@ -20,6 +20,7 @@
         IEnumerable<TrelloUserStoryViewModel> TrelloUserStories,
         string LogStackTrace,
         IEnumerable<string> Tags,
-        Guid ProjectId
+        Guid ProjectId,
+        bool IsCurrentUserOnMailLetter
     );
 }

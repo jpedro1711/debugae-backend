@@ -22,6 +22,9 @@ namespace GestaoDefeitos.Infrastructure.Configurations
 
             builder.Property(c => c.ContributorProfession)
                 .IsRequired();
+
+            builder.HasMany(c => c.DefectsAssignedTo)
+                .WithOne(d => d.AssignedToContributor);
         }
     }
 }

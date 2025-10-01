@@ -11,5 +11,7 @@ namespace GestaoDefeitos.Domain.Entities
         public string FullName => $"{Firstname} {Lastname}";
         public ContributorProfession ContributorProfession { get; set; }
         public List<ProjectContributor> ProjectContributors { get; set; } = [];
+        public ICollection<DefectMailLetter> DefectsSubscribedAtMailLetter { get; set; } = [];
+        public List<Defect> DefectsAssignedTo { get; set; } = [];
     }
 }

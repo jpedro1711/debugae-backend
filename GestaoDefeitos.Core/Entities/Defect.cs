@@ -1,5 +1,6 @@
 ﻿using GestaoDefeitos.Domain.Entities.Events;
 using GestaoDefeitos.Domain.Enums;
+using System.Collections;
 
 namespace GestaoDefeitos.Domain.Entities
 {
@@ -31,5 +32,6 @@ namespace GestaoDefeitos.Domain.Entities
         public List<Tag> Tags { get; set; } = [];
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+        public ICollection<DefectMailLetter> ContributorMailLetter { get; set; } = [];
     }
 }
