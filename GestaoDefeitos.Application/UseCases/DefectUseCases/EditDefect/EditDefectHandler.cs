@@ -44,7 +44,14 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.EditDefect
             {
                 await mediator.Publish(change, cancellationToken);
 
-                await mediator.Publish(new NotifyDefectMailLetterNotification { DefectId = updatedDefect.Id, Content = $"O {change.Field} de defeito {updatedDefect.Id} foi atualizado" }, cancellationToken);
+                if (change.Field == nameof(Defect.AssignedToContributorId) && userId == updatedDefect.AssignedToContributorId)
+                {
+                    await mediator.Publish(new NotifyDefectMailLetterNotification { DefectId = updatedDefect.Id, Content = $"O defeito {updatedDefect.Id} foi assinalado ao seu usuário" }, cancellationToken);
+                }
+                else
+                {
+                    await mediator.Publish(new NotifyDefectMailLetterNotification { DefectId = updatedDefect.Id, Content = $"O defeito {updatedDefect.Id} foi atualizado - {change.Field}" }, cancellationToken);
+                }
             }
 
             return new EditDefectResponse(updatedDefect.Id.ToString());

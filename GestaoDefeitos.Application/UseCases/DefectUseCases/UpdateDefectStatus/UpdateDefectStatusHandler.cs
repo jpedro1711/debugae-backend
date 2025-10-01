@@ -47,7 +47,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
             if (loggedUserId != defect.AssignedToContributorId)
                 await SaveUserNotification(defect.AssignedToContributorId, contributorNotificationRepository, updatedDefect.Id);
 
-            await NotificateEmailLetter(updatedDefect.Id, $"O defeito {updatedDefect.Id} mudou para o status {updatedDefect.Status}.", mediator);
+            await NotificateEmailLetter(updatedDefect.Id, $"O defeito {updatedDefect.Id} mudou de status.", mediator);
 
             return new UpdateDefectStatusResponse(defect.Id, defect.Status);
         }

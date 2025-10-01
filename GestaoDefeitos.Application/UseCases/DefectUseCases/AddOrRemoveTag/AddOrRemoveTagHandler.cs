@@ -40,7 +40,7 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag
 
             var created = await tagRepository.AddAsync(newTag);
 
-            await mediator.Publish(new NotifyDefectMailLetterNotification { DefectId = defect.Id, Content = $"As tags do defeito {defect.Id} foi atualizado" }, cancellationToken);
+            await mediator.Publish(new NotifyDefectMailLetterNotification { DefectId = defect.Id, Content = $"As tags do defeito {defect.Id} foram atualizadas" }, cancellationToken);
 
             return new AddOrRemoveTagResponse(defect.Id, created.Id);
         }
