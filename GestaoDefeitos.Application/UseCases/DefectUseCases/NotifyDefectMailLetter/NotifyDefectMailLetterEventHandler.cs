@@ -10,25 +10,25 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.NotifyDefectMailLet
         public async Task Handle(NotifyDefectMailLetterNotification notification, CancellationToken cancellationToken)
         {
             var userSubscribedToLetterIds = await defectMailLetterRepository.GetEnrolledContributorsIds(notification.DefectId);
-
             var loggedUserId = authenticationContext.GetCurrentLoggedUserId();
 
-            userSubscribedToLetterIds.ForEach(async (user) =>
-            {
-                if (loggedUserId != user)
+            var notifications = userSubscribedToLetterIds
+                .Where(user => user != loggedUserId)
+                .Select(user => new ContributorNotification
                 {
-                    var userNotification = new ContributorNotification
-                    {
-                        Id = Guid.NewGuid(),
-                        ContributorId = user,
-                        Content = notification.Content,
-                        IsRead = false,
-                        CreatedAt = DateTime.UtcNow
-                    };
+                    Id = Guid.NewGuid(),
+                    ContributorId = user,
+                    Content = notification.Content,
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                })
+                .ToList();
 
-                    await contributorNotificationRepository.AddAsync(userNotification);
-                }
-            });
+            if (notifications.Count > 0)
+            {
+                await contributorNotificationRepository.AddRangeAsync(notifications);
+            }
         }
+
     }
 }

@@ -46,5 +46,12 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<TEntity> AddRangeAsync(IEnumerable<TEntity> entities)
+        {
+            await _context.Set<TEntity>().AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
+            return entities.First();
+        }
     }
 }
