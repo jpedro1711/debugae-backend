@@ -34,5 +34,10 @@ namespace GestaoDefeitos.Infrastructure.Repositories
         {
             return await context.DefectMailLetters.FirstOrDefaultAsync(x => x.DefectId == DefectId && x.ContributorId == ContributorId);
         }
+
+        public async Task<List<Guid>> GetEnrolledContributorsIds(Guid DefectId)
+        {
+            return await context.DefectMailLetters.Where(x => x.DefectId == DefectId).Select(x => x.ContributorId).ToListAsync();
+        }
     }
 }

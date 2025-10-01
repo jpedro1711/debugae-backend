@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.DefectChangedEvent;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.NotifyDefectMailLetter;
 using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Enums;
@@ -46,6 +47,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
             if (loggedUserId != defect.AssignedToContributorId)
                 await SaveUserNotification(defect.AssignedToContributorId, contributorNotificationRepository, updatedDefect.Id);
 
+            await NotificateEmailLetter(updatedDefect.Id, $"O defeito {updatedDefect.Id} mudou para o status {updatedDefect.Status}.", mediator);
+
             return new UpdateDefectStatusResponse(defect.Id, defect.Status);
         }
 
@@ -61,6 +64,18 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.UpdateDefectStatus
             };
 
             await notificationRepository.AddAsync(notification);
+        }
+
+        public static async Task NotificateEmailLetter(Guid defectId, string content, IMediator mediator)
+        {
+            var notification = new NotifyDefectMailLetterNotification
+            {
+                DefectId = defectId,
+                Content = content,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await mediator.Publish(notification);
         }
     }
 }

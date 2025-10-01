@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Domain.Entities;
+﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.NotifyDefectMailLetter;
+using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
 
@@ -6,7 +7,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag
 {
     public class AddOrRemoveTagHandler(
             ITagRepository tagRepository,
-            IDefectRepository defectRepository
+            IDefectRepository defectRepository,
+            IMediator mediator
         ) : IRequestHandler<AddOrRemoveTagCommand, AddOrRemoveTagResponse?>
     {
         public async Task<AddOrRemoveTagResponse?> Handle(AddOrRemoveTagCommand command, CancellationToken cancellationToken)
@@ -37,6 +39,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddOrRemoveTag
             };
 
             var created = await tagRepository.AddAsync(newTag);
+
+            await mediator.Publish(new NotifyDefectMailLetterNotification { DefectId = defect.Id, Content = $"As tags do defeito {defect.Id} foi atualizado" }, cancellationToken);
 
             return new AddOrRemoveTagResponse(defect.Id, created.Id);
         }

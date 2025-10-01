@@ -7,5 +7,6 @@ namespace GestaoDefeitos.Domain.Interfaces.Repositories
         Task AddToMailLetter(Guid DefectId, Guid ContributorId);
         Task RemoveFromMailLetter(Guid DefectId, Guid ContributorId);
         Task<DefectMailLetter?> GetByCompositeIdAsync(Guid DefectId, Guid ContributorId);
+        Task<List<Guid>> GetEnrolledContributorsIds(Guid DefectId);
     }
 }

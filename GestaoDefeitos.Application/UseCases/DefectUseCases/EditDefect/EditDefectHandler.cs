@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.DefectChangedEvent;
+using GestaoDefeitos.Application.UseCases.DefectUseCases.NotifyDefectMailLetter;
 using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Enums;
@@ -40,7 +41,11 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.EditDefect
                 ?? throw new InvalidOperationException("Erro ao atualizar o defeito.");
 
             foreach (var change in changes)
+            {
                 await mediator.Publish(change, cancellationToken);
+
+                await mediator.Publish(new NotifyDefectMailLetterNotification { DefectId = updatedDefect.Id, Content = $"O {change.Field} de defeito {updatedDefect.Id} foi atualizado" }, cancellationToken);
+            }
 
             return new EditDefectResponse(updatedDefect.Id.ToString());
         }

@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Application.Utils;
+﻿using GestaoDefeitos.Application.UseCases.DefectUseCases.NotifyDefectMailLetter;
+using GestaoDefeitos.Application.Utils;
 using GestaoDefeitos.Domain.Entities;
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using MediatR;
@@ -9,7 +10,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddCommentToDefect
         (
             IDefectRepository defectRepository,
             IDefectCommentRepository defectCommentRepository,
-            AuthenticationContextAcessor authenticationContextAcessor
+            AuthenticationContextAcessor authenticationContextAcessor,
+            IMediator mediator
         ) : IRequestHandler<AddCommentToDefectCommand, AddCommentToDefectResponse?>
     {
         public async Task<AddCommentToDefectResponse?> Handle(AddCommentToDefectCommand command, CancellationToken cancellationToken)
@@ -31,6 +33,8 @@ namespace GestaoDefeitos.Application.UseCases.DefectUseCases.AddCommentToDefect
             };
 
             var createdComment = await defectCommentRepository.AddAsync(newComment);
+
+            await mediator.Publish(new NotifyDefectMailLetterNotification { DefectId = defect.Id, Content = $"Comentários foram adicionados ao defeito ${defect.Id}" }, cancellationToken);
 
             return new AddCommentToDefectResponse(createdComment.DefectId, createdComment.Id);
         }
