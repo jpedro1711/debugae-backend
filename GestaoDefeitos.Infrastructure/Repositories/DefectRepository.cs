@@ -24,7 +24,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         d.ExpiresIn,
                         d.CreatedAt,
                         d.DefectCategory.ToString(),
-                        new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt)
+                        new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
+                        d.Tags.Select(t => t.Description).ToList()
                        ))
                 .ToListAsync(cancellationToken);
         }
@@ -62,7 +63,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         d.ExpiresIn,
                         d.CreatedAt,
                         d.DefectCategory.ToString(),
-                        new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt)
+                        new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
+                        d.Tags.Select(t => t.Description).ToList()
                        ))
                 .ToListAsync(cancellationToken);
         }
@@ -102,7 +104,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     d.ExpiresIn,
                     d.CreatedAt,
                     d.DefectCategory.ToString(),
-                    new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt)
+                    new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
+                    d.Tags.Select(t => t.Description).ToList()
                 ))
                 .ToListAsync(cancellationToken);
 
@@ -130,7 +133,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     d.ExpiresIn,
                     d.CreatedAt,
                     d.DefectCategory.ToString(),
-                    new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt)
+                    new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
+                    d.Tags.Select(t => t.Description).ToList()
                 ))
                 .ToListAsync(cancellationToken);
 
@@ -187,7 +191,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                             d.ExpiresIn,
                             rd.RelatedDefect.CreatedAt,
                             rd.RelatedDefect.DefectCategory.ToString(),
-                            new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt)
+                            new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
+                            d.Tags.Select(t => t.Description).ToList()
                         )),
                         null, // it will be populated in the handler
                         d.TrelloUserStories.Select(ts => new TrelloUserStoryViewModel(

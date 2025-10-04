@@ -9,6 +9,7 @@
             DateTime ExpirationDate,
             DateTime CreatedAt,
             string Category,
-            ProjectSimplifiedViewModel Project
+            ProjectSimplifiedViewModel Project,
+            List<string> Tags
         );
 }

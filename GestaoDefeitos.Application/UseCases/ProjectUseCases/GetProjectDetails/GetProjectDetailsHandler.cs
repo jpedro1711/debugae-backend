@@ -76,7 +76,8 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
                             project.Name,
                             project.Description,
                             project.CreatedAt
-                        )
+                        ),
+                        d.Tags.Select(t => t.Description).ToList()
                     )).ToList()
                 );
         }
