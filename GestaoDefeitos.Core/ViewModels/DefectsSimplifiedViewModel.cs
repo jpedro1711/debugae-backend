@@ -10,6 +10,8 @@
             DateTime CreatedAt,
             string Category,
             ProjectSimplifiedViewModel Project,
-            List<string> Tags
+            List<string> Tags,
+            string Version,
+            DateTime? ResolvedAt 
         );
 }

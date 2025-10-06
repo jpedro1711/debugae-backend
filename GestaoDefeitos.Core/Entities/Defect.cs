@@ -1,6 +1,5 @@
 ﻿using GestaoDefeitos.Domain.Entities.Events;
 using GestaoDefeitos.Domain.Enums;
-using System.Collections;
 
 namespace GestaoDefeitos.Domain.Entities
 {

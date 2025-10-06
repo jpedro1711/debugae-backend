@@ -1,4 +1,5 @@
-﻿using GestaoDefeitos.Domain.ViewModels;
+﻿using GestaoDefeitos.Domain.Enums;
+using GestaoDefeitos.Domain.ViewModels;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -25,6 +26,7 @@ namespace GestaoDefeitos.Application.PdfReport
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Helvetica"));
 
+                    // --- Header ---
                     page.Header().Row(row =>
                     {
                         row.RelativeItem().Column(stack =>
@@ -60,6 +62,7 @@ namespace GestaoDefeitos.Application.PdfReport
 
                     page.Content().PaddingVertical(1, Unit.Centimetre).Column(stack =>
                     {
+                        // Cálculos das Métricas
                         var statusGroups = defects
                             .GroupBy(d => d.Status.ToUpper())
                             .OrderBy(g => g.Key)
@@ -70,6 +73,38 @@ namespace GestaoDefeitos.Application.PdfReport
                             .OrderBy(g => g.Key)
                             .ToDictionary(g => g.Key, g => g.Count());
 
+                        var defectsBySeverity = defects
+                            .GroupBy(d => d.DefectPriority)
+                            .ToDictionary(g => g.Key, g => g.Count());
+
+                        var defectByCategory = defects
+                            .GroupBy(d => d.Category)
+                            .ToDictionary(g => g.Key, g => g.Count());
+
+                        var defectByVersion = defects
+                            .GroupBy(d => d.Version)
+                            .ToDictionary(g => g.Key, g => g.Count());
+
+                        var resolvedDefects = defects
+                            .Where(d => d.Status.Equals(DefectStatus.Resolved) && d.ResolvedAt.HasValue)
+                            .ToList();
+
+                        var mediumResolutionTimeInDays = resolvedDefects
+                            .Select(d => (d.ResolvedAt.Value - d.CreatedAt).TotalDays)
+                            .DefaultIfEmpty(0)
+                            .Average();
+
+                        var totalDefectsCount = defects.Count;
+
+                        var resolutionIndex = (double)resolvedDefects.Count / totalDefectsCount;
+
+                        static IContainer CardStyle(IContainer container) =>
+                            container.Border(1)
+                                     .BorderColor(Colors.Grey.Lighten1)
+                                     .Padding(10)
+                                     .Background(Colors.Grey.Lighten4)
+                                     .ShowOnce();
+
                         stack.Item().Row(row =>
                         {
                             row.RelativeItem().Element(CardStyle).Column(card =>
@@ -79,7 +114,7 @@ namespace GestaoDefeitos.Application.PdfReport
                                     card.Item().Text($"{item.Key}: {item.Value}");
                             });
 
-                            row.ConstantItem(20); // Espaço entre os cards
+                            row.ConstantItem(10);
 
                             row.RelativeItem().Element(CardStyle).Column(card =>
                             {
@@ -87,16 +122,34 @@ namespace GestaoDefeitos.Application.PdfReport
                                 foreach (var item in priorityGroups)
                                     card.Item().Text($"{item.Key}: {item.Value}");
                             });
+                        });
 
-                            static IContainer CardStyle(IContainer container) =>
-                                container.Border(1)
-                                         .BorderColor(Colors.Grey.Lighten1)
-                                         .Padding(10)
-                                         .Background(Colors.Grey.Lighten4)
-                                         .ShowOnce();
+                        stack.Item().PaddingVertical(10);
+
+                        stack.Item().Row(row =>
+                        {
+                            row.RelativeItem().Element(CardStyle).Column(card =>
+                            {
+                                card.Item().Text("Métricas Chave").Bold().FontSize(12);
+                                card.Item().Text($"Total de Defeitos: {totalDefectsCount}");
+                                card.Item().Text($"Tempo Médio de Resolução: {mediumResolutionTimeInDays:F2} dias");
+                                card.Item().Text($"Índice de Resolução: {resolutionIndex:P2}");
+                            });
+
+                            row.ConstantItem(10); 
+
+                            // Card por Categoria
+                            row.RelativeItem().Element(CardStyle).Column(card =>
+                            {
+                                card.Item().Text("Defeitos por Categoria").Bold().FontSize(12);
+                                foreach (var item in defectByCategory)
+                                    card.Item().Text($"{item.Key}: {item.Value}");
+                            });
                         });
 
                         stack.Item().PaddingTop(20);
+
+                        stack.Item().Text("Lista de Defeitos").Bold().FontSize(14).Underline().ParagraphSpacing(5);
 
                         stack.Item().Element(container =>
                         {
@@ -121,17 +174,30 @@ namespace GestaoDefeitos.Application.PdfReport
                                         container.Background(Colors.Grey.Lighten3)
                                                  .BorderBottom(1)
                                                  .BorderColor(Colors.Grey.Medium)
-                                                 .PaddingBottom(4)
-                                                 .PaddingTop(2);
+                                                 .PaddingVertical(4)
+                                                 .PaddingHorizontal(5);
                                 });
+
+                                IContainer DataCellStyle(IContainer container, int index)
+                                {
+                                    var backgroundColor = index % 2 == 0 ? Colors.White : Colors.Grey.Lighten5;
+
+                                    return container
+                                        .Background(backgroundColor)
+                                        .PaddingVertical(5)
+                                        .PaddingHorizontal(5)
+                                        .BorderBottom(1)
+                                        .BorderColor(Colors.Grey.Lighten3);
+                                }
+
 
                                 int index = 1;
                                 foreach (var defect in defects)
                                 {
-                                    table.Cell().Text(index.ToString());
-                                    table.Cell().Text(defect.Summary);
-                                    table.Cell().Text(defect.Status.ToUpper());
-                                    table.Cell().AlignRight().Text(defect.DefectPriority.ToUpper());
+                                    table.Cell().Element(c => DataCellStyle(c, index)).Text(index.ToString());
+                                    table.Cell().Element(c => DataCellStyle(c, index)).Text(defect.Summary);
+                                    table.Cell().Element(c => DataCellStyle(c, index)).Text(defect.Status.ToUpper());
+                                    table.Cell().Element(c => DataCellStyle(c, index)).AlignRight().Text(defect.DefectPriority.ToUpper());
 
                                     index++;
                                 }
@@ -145,6 +211,8 @@ namespace GestaoDefeitos.Application.PdfReport
                         {
                             x.Span("Página ");
                             x.CurrentPageNumber();
+                            x.Span(" de ");
+                            x.TotalPages();
                         });
                 });
             });

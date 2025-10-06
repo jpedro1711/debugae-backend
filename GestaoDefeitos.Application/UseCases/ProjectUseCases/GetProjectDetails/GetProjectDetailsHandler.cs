@@ -77,7 +77,9 @@ namespace GestaoDefeitos.Application.UseCases.ProjectUseCases.GetProjectDetails
                             project.Description,
                             project.CreatedAt
                         ),
-                        d.Tags.Select(t => t.Description).ToList()
+                        d.Tags.Select(t => t.Description).ToList(),
+                        d.Version,
+                        d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString())?.CreatedAt
                     )).ToList()
                 );
         }
