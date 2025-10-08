@@ -27,7 +27,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                         d.Tags.Select(t => t.Description).ToList(),
                         d.Version,
-                        d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt
+                        d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                        d.DefectSeverity.ToString()
                        ))
                 .ToListAsync(cancellationToken);
         }
@@ -68,7 +69,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                         d.Tags.Select(t => t.Description).ToList(),
                         d.Version,
-                        d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt
+                        d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                        d.DefectSeverity.ToString()
                        ))
                 .ToListAsync(cancellationToken);
         }
@@ -80,11 +82,11 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<Defect>> GetDefectsDataByProjectIdAsync(Guid projectId)
+        public IQueryable<Defect> GetDefectsDataByProjectIdAsync(Guid projectId)
         {
-            return await _context.Defects
+            return  _context.Defects
                 .Where(d => d.ProjectId == projectId)
-                .ToListAsync();
+                .AsQueryable();
         }
 
         public async Task<PagedResult<DefectsSimplifiedViewModel>> GetDefectsByProjectPagedAsync(
@@ -111,7 +113,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                     d.Tags.Select(t => t.Description).ToList(),
                     d.Version,
-                    d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt
+                    d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                    d.DefectSeverity.ToString()
                 ))
                 .ToListAsync(cancellationToken);
 
@@ -142,7 +145,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                     d.Tags.Select(t => t.Description).ToList(),
                     d.Version,
-                    d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt
+                    d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                        d.DefectSeverity.ToString()
                 ))
                 .ToListAsync(cancellationToken);
 
@@ -202,7 +206,8 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                             new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                             d.Tags.Select(t => t.Description).ToList(),
                             d.Version,
-                            d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt
+                            d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                            d.DefectSeverity.ToString()
                         )),
                         null, // it will be populated in the handler
                         d.TrelloUserStories.Select(ts => new TrelloUserStoryViewModel(

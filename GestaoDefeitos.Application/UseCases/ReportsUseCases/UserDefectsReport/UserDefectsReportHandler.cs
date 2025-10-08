@@ -8,7 +8,8 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
 {
     public class UserDefectsReportHandler(
             IDefectRepository defectRepository,
-            AuthenticationContextAcessor authenticationContextAcessor
+            AuthenticationContextAcessor authenticationContextAcessor,
+            IDefectHistoryRepository defectHistoryRepository
         ) : IRequestHandler<UserDefectsReportQuery, UserDefectsReportResponse?>
     {
         public async Task<UserDefectsReportResponse?> Handle(UserDefectsReportQuery request, CancellationToken cancellationToken)
@@ -25,6 +26,35 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
                 Resolved = defectsData.Count(d => d.Status == DefectStatus.Resolved),
                 New = defectsData.Count(d => d.Status == DefectStatus.New)
             };
+
+            decimal resolvedDefectsCount = defectsData.Count(d => d.Status == DefectStatus.Resolved);
+            decimal invalidDefectsCount = defectsData.Count(d => d.Status == DefectStatus.Invalid);
+
+            decimal resolutionIndex = ((resolvedDefectsCount - invalidDefectsCount) / defectsData.Count) * 100;
+
+            IEnumerable<DefectByVersionViewModel> defectByVersion = defectsData
+                .GroupBy(d => d.Version)
+                .Select(d => new DefectByVersionViewModel
+                {
+                    Name = d.Key,
+                    Value = d.Count()
+                });
+
+            double defectResolutionAverageTimeInDays = defectsData.Count == 0 ? 0 : defectsData
+                .Where(d => d.Status == DefectStatus.Resolved)
+                .Select(d =>
+                {
+                    var history = defectHistoryRepository.GetDefectHistoryByDefectIdAsync(d.Id, cancellationToken).Result;
+                    var resolvedEntry = history
+                        .FirstOrDefault(h => h.NewValue == DefectStatus.Resolved.ToString());
+                    if (resolvedEntry != null)
+                    {
+                        return (resolvedEntry.CreatedAt - d.CreatedAt).TotalDays;
+                    }
+                    return 0;
+                })
+                .DefaultIfEmpty(0)
+                .Average();
 
             var statusData = Enum.GetValues(typeof(DefectStatus))
                 .Cast<DefectStatus>()
@@ -79,7 +109,10 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
                 {
                     Date = td.date,
                     Defects = td.defects
-                }).ToList()
+                }).ToList(),
+                ResolutionIndex = Math.Round(resolutionIndex, 2),
+                DefectByVersion = defectByVersion,
+                DefectResolutionAverageTimeInDays = Math.Round(defectResolutionAverageTimeInDays, 2)
             };
         }
     }

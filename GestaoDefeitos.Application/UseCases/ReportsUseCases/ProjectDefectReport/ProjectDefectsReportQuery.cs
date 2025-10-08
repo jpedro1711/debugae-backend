@@ -2,5 +2,5 @@
 
 namespace GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport
 {
-    public record ProjectDefectsReportQuery(Guid ProjectId) : IRequest<ProjectDefectsReportResponse?>;
+    public record ProjectDefectsReportQuery(Guid ProjectId, DateTime? InitialDate, DateTime? FinalDate) : IRequest<ProjectDefectsReportResponse?>;
 }

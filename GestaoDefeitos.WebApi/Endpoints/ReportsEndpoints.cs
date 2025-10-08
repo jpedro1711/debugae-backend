@@ -44,9 +44,9 @@ namespace GestaoDefeitos.WebApi.Endpoints
         public static RouteGroupBuilder MapGetProjectDefectsReport(this RouteGroupBuilder group)
         {
             group.MapPost("/getProjectDefectsReport", async (
-                IMediator mediator, [FromQuery] Guid ProjectId) =>
+                IMediator mediator, [FromQuery] Guid ProjectId, [FromQuery] DateTime? InitialDate, [FromQuery] DateTime? FinalDate) =>
             {
-                var projectDefectsData = await mediator.Send(new ProjectDefectsReportQuery(ProjectId));
+                var projectDefectsData = await mediator.Send(new ProjectDefectsReportQuery(ProjectId, InitialDate, FinalDate));
 
                 return (projectDefectsData is not null)
                     ? Results.Ok(projectDefectsData)

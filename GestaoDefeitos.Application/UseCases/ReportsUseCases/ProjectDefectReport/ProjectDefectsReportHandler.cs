@@ -2,19 +2,65 @@
 using GestaoDefeitos.Domain.Interfaces.Repositories;
 using GestaoDefeitos.Domain.ViewModels.DefectsReport;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport
 {
     public class ProjectDefectsReportHandler
         (
-            IDefectRepository defectRepository
+            IDefectRepository defectRepository,
+            IDefectHistoryRepository defectHistoryRepository
         ) : IRequestHandler<ProjectDefectsReportQuery, ProjectDefectsReportResponse?>
     {
         public async Task<ProjectDefectsReportResponse?> Handle(
             ProjectDefectsReportQuery request,
             CancellationToken cancellationToken)
         {
-            var defectsData = await defectRepository.GetDefectsDataByProjectIdAsync(request.ProjectId);
+            var defectsDataByProject = defectRepository.GetDefectsDataByProjectIdAsync(request.ProjectId);
+
+            if (request.InitialDate.HasValue && request.FinalDate.HasValue)
+            {
+                var initialDate = request.InitialDate.Value.Date;
+                var finalDate = request.FinalDate.Value.Date.AddDays(1).AddTicks(-1);
+
+                defectsDataByProject = defectsDataByProject.Where(d => d.CreatedAt >= initialDate && d.CreatedAt <= finalDate);
+            }
+            else if (request.InitialDate.HasValue)
+            {
+                var initialDate = request.InitialDate.Value.Date;
+                defectsDataByProject = defectsDataByProject.Where(d => d.CreatedAt >= initialDate);
+            }
+            else if (request.FinalDate.HasValue)
+            {
+                var finalDate = request.FinalDate.Value.Date.AddDays(1).AddTicks(-1); 
+                defectsDataByProject = defectsDataByProject.Where(d => d.CreatedAt <= finalDate);
+            }
+
+            var defectsData = await defectsDataByProject.ToListAsync(cancellationToken);
+
+            if (defectsData is null || defectsData.Count == 0)
+            {
+                var emptyMetrics = new DefectMetricsViewModel
+                {
+                    HighPriority = 0,
+                    InProgress = 0,
+                    New = 0,
+                    Resolved = 0,
+                    Total = 0
+                };
+
+                return new ProjectDefectsReportResponse
+                {
+                    Metrics = emptyMetrics,
+                    StatusData = new(),
+                    SeverityData = new(),
+                    CategoryData = new(),
+                    TimelineData = new(),
+                    ResolutionIndex = 0,
+                    DefectByVersion = Enumerable.Empty<DefectByVersionViewModel>(),
+                    DefectResolutionAverageTimeInDays = 0
+                };
+            }
 
             var metrics = new DefectMetricsViewModel
             {
@@ -24,6 +70,35 @@ namespace GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport
                 Resolved = defectsData.Count(d => d.Status == DefectStatus.Resolved),
                 New = defectsData.Count(d => d.Status == DefectStatus.New)
             };
+
+            decimal resolvedDefectsCount = defectsData.Count(d => d.Status == DefectStatus.Resolved);
+            decimal invalidDefectsCount = defectsData.Count(d => d.Status == DefectStatus.Invalid);
+
+            decimal resolutionIndex = ((resolvedDefectsCount - invalidDefectsCount) / defectsData.Count) * 100;
+
+            IEnumerable<DefectByVersionViewModel> defectByVersion = defectsData
+                .GroupBy(d => d.Version)
+                .Select(d => new DefectByVersionViewModel
+                {
+                    Name = d.Key,
+                    Value = d.Count()
+                });
+
+            double defectResolutionAverageTimeInDays = defectsData.Count == 0 ? 0 : defectsData
+                .Where(d => d.Status == DefectStatus.Resolved)
+                .Select(d =>
+                {
+                    var history = defectHistoryRepository.GetDefectHistoryByDefectIdAsync(d.Id, cancellationToken).Result;
+                    var resolvedEntry = history
+                        .FirstOrDefault(h => h.NewValue == DefectStatus.Resolved.ToString());
+                    if (resolvedEntry != null)
+                    {
+                        return (resolvedEntry.CreatedAt - d.CreatedAt).TotalDays;
+                    }
+                    return 0;
+                })
+                .DefaultIfEmpty(0)
+                .Average();
 
             var statusData = Enum.GetValues(typeof(DefectStatus))
                 .Cast<DefectStatus>()
@@ -78,7 +153,10 @@ namespace GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport
                 {
                     Date = td.date,
                     Defects = td.defects
-                }).ToList()
+                }).ToList(),
+                ResolutionIndex = Math.Round(resolutionIndex, 2),
+                DefectByVersion = defectByVersion,
+                DefectResolutionAverageTimeInDays = Math.Round(defectResolutionAverageTimeInDays, 2)
             };
         }
     }

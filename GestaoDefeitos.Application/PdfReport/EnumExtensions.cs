@@ -1,0 +1,55 @@
+﻿using System.ComponentModel;
+using System.Reflection;
+
+namespace GestaoDefeitos.Application.PdfReport
+{
+    public static class EnumExtensions
+    {
+        public static string GetDescription(this System.Enum value)
+        {
+            FieldInfo field = value.GetType().GetField(value.ToString());
+
+            DescriptionAttribute attribute = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute;
+
+            return attribute == null ? value.ToString() : attribute.Description;
+        }
+
+        public static string GetPortugueseDescription(this System.Enum value)
+        {
+            var englishDescription = value.GetDescription();
+
+            return englishDescription switch
+            {
+                // DefectStatus
+                "Resolved" => "Resolvido",
+                "Invalid" => "Inválido",
+                "Reopened" => "Reaberto",
+                "In Progress" => "Em Andamento",
+                "Waiting for User" => "Aguardando Usuário",
+                "New" => "Novo",
+
+                // DefectPriority
+                "P1 - Too high" => "P1 - Altíssima",
+                "P2 - High" => "P2 - Alta",
+                "P3 - Medium" => "P3 - Média",
+                "P4 - Low" => "P4 - Baixa",
+                "P5 - Too low" => "P5 - Baixíssima",
+
+                // DefectSeverity
+                "Very high" => "Gravíssima",
+                "High" => "Grave",
+                "Medium" => "Média",
+                "Low" => "Leve",
+                "Very low" => "Muito Leve",
+
+                // DefectCategory
+                "Functional" => "Funcional",
+                "Interface" => "Interface",
+                "Performance" => "Performance",
+                "Improvement" => "Melhoria",
+
+                _ => value.ToString()
+            };
+        }
+    }
+}

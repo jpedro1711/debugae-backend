@@ -12,6 +12,7 @@
             ProjectSimplifiedViewModel Project,
             List<string> Tags,
             string Version,
-            DateTime? ResolvedAt 
+            DateTime? ResolvedAt,
+            string Severity
         );
 }
