@@ -120,7 +120,12 @@ namespace GestaoDefeitos.Application.PdfReport
 
                         var resolutionIndex = Math.Round((double)resolvedDefects.Count / (totalDefectsCount > 0 ? totalDefectsCount : 1) * 100, 2);
 
-                        var invalidDefectsIndex = Math.Round((double)defects.Count(d => d.Status.Equals(DefectStatus.Invalid.ToString())) / (totalDefectsCount > 0 ? totalDefectsCount : 1) * 100, 2);
+                        var invalidDefectsIndex = Math.Round(
+                            (decimal)defects.Count(d => d.Status.Equals(DefectStatus.Invalid.ToString()))
+                            / (totalDefectsCount > 0 ? totalDefectsCount : 1)
+                            * 100,
+                            2);
+
                         // Estilo de Card Aprimorado
                         static QuestPDF.Infrastructure.IContainer CardStyle(QuestPDF.Infrastructure.IContainer container) =>
                             container.Border(1)
@@ -159,7 +164,7 @@ namespace GestaoDefeitos.Application.PdfReport
                                 card.Item().Text($"Total de Defeitos: {totalDefectsCount}");
                                 card.Item().Text($"Tempo Médio de Resolução: {mediumResolutionTimeInDays:F2} dias");
                                 card.Item().Text($"Índice de Resolução: {resolutionIndex}%");
-                                card.Item().Text($"Índice de defeitos Inválidos: {invalidDefectsIndex}");
+                                card.Item().Text($"Índice de defeitos Inválidos: {invalidDefectsIndex}%");
                             });
 
                             row.ConstantItem(10);
