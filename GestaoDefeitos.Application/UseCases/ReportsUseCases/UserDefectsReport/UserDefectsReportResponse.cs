@@ -12,6 +12,7 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
         public decimal ResolutionIndex { get; set; }
         public IEnumerable<DefectByVersionViewModel>? DefectByVersion { get; set; }
         public double DefectResolutionAverageTimeInDays { get; set; }
+        public decimal InvalidDefectsPercentage { get; set; }
     }
 
 }

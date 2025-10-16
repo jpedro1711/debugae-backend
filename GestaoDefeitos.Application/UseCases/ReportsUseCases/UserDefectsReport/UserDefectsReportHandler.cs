@@ -65,6 +65,8 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
                 })
                 .ToList();
 
+            decimal invalidDefectIndex = (defectsData.Count == 0) ? 0 : (invalidDefectsCount / defectsData.Count) * 100;
+
             var severityData = Enum.GetValues(typeof(DefectSeverity))
                 .Cast<DefectSeverity>()
                 .Select(severity => new DefectBySeverityViewModel
@@ -112,7 +114,8 @@ namespace GestaoDefeitos.Application.UseCases.Reports.UserDefectsReport
                 }).ToList(),
                 ResolutionIndex = Math.Round(resolutionIndex, 2),
                 DefectByVersion = defectByVersion,
-                DefectResolutionAverageTimeInDays = Math.Round(defectResolutionAverageTimeInDays, 2)
+                DefectResolutionAverageTimeInDays = Math.Round(defectResolutionAverageTimeInDays, 2),
+                InvalidDefectsPercentage = Math.Round(invalidDefectIndex, 2)
             };
         }
     }

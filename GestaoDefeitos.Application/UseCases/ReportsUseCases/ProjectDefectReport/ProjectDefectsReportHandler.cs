@@ -76,6 +76,8 @@ namespace GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport
 
             decimal resolutionIndex = ((resolvedDefectsCount - invalidDefectsCount) / defectsData.Count) * 100;
 
+            decimal invalidDefectIndex = (defectsData.Count == 0) ? 0 : (invalidDefectsCount / defectsData.Count) * 100;
+
             IEnumerable<DefectByVersionViewModel> defectByVersion = defectsData
                 .GroupBy(d => d.Version)
                 .Select(d => new DefectByVersionViewModel
@@ -156,7 +158,8 @@ namespace GestaoDefeitos.Application.UseCases.Reports.ProjectDefectReport
                 }).ToList(),
                 ResolutionIndex = Math.Round(resolutionIndex, 2),
                 DefectByVersion = defectByVersion,
-                DefectResolutionAverageTimeInDays = Math.Round(defectResolutionAverageTimeInDays, 2)
+                DefectResolutionAverageTimeInDays = Math.Round(defectResolutionAverageTimeInDays, 2),
+                InvalidDefectsPercentage = Math.Round(invalidDefectIndex, 2)
             };
         }
     }
