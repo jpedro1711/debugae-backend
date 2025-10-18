@@ -11,11 +11,19 @@ namespace GestaoDefeitos.Application.PdfReport
     {
         private static readonly string MainColor = Colors.Purple.Darken2;
 
-        private static string MapStringToPortuguese(string value, Type enumType)
+        private static string MapStringToPortuguese(string? value, Type enumType)
         {
-            if (System.Enum.TryParse(enumType, value, true, out object enumValue))
+            if (string.IsNullOrWhiteSpace(value) || enumType is null)
+                return "Desconhecido";
+
+            try
             {
-                return ((System.Enum)enumValue).GetPortugueseDescription();
+                if (System.Enum.TryParse(enumType, value, true, out object? enumValue) && enumValue is System.Enum e)
+                    return e.GetPortugueseDescription();
+            }
+            catch
+            {
+                // ignore and fallback
             }
             return value;
         }
@@ -26,7 +34,7 @@ namespace GestaoDefeitos.Application.PdfReport
                 throw new ArgumentNullException(nameof(defects), "Defects cannot be null");
 
             var emissionDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm", new CultureInfo("pt-BR"));
-            var userName = loggedUsername;
+            var userName = loggedUsername ?? string.Empty;
 
             return Document.Create(container =>
             {
@@ -45,7 +53,7 @@ namespace GestaoDefeitos.Application.PdfReport
                             stack.Item().Text("Debugaê")
                                 .Bold()
                                 .FontSize(24)
-                                .FontColor(MainColor); // Cor roxa para o título
+                                .FontColor(MainColor);
 
                             stack.Item().Text("Relatório de Defeitos")
                                 .FontSize(14)
@@ -57,7 +65,7 @@ namespace GestaoDefeitos.Application.PdfReport
                                 text.Span(emissionDate).FontSize(10);
                             });
 
-                            if (projectName is not null && projectName.Length > 0)
+                            if (!string.IsNullOrWhiteSpace(projectName))
                             {
                                 stack.Item().Text(text =>
                                 {
@@ -65,7 +73,6 @@ namespace GestaoDefeitos.Application.PdfReport
                                     text.Span(projectName).FontSize(10);
                                 });
                             }
-
 
                             stack.Item().Text(text =>
                             {
@@ -98,16 +105,16 @@ namespace GestaoDefeitos.Application.PdfReport
 
                         // Variável defectByVersion adicionada ao relatório
                         var versionGroups = defects
-                            .GroupBy(d => d.Version)
+                            .GroupBy(d => string.IsNullOrWhiteSpace(d.Version) ? "Sem versão" : d.Version)
                             .OrderBy(g => g.Key)
                             .ToDictionary(g => g.Key, g => g.Count());
 
                         var resolvedDefects = defects
-                            .Where(d => d.Status.Equals(DefectStatus.Resolved.ToString()) && d.ResolvedAt.HasValue)
+                            .Where(d => string.Equals(d.Status, DefectStatus.Resolved.ToString(), StringComparison.OrdinalIgnoreCase) && d.ResolvedAt.HasValue)
                             .ToList();
 
                         decimal mediumResolutionTimeInDays = (decimal)resolvedDefects
-                            .Select(d => (d.ResolvedAt.Value - d.CreatedAt).TotalDays)
+                            .Select(d => (d.ResolvedAt!.Value - d.CreatedAt).TotalDays)
                             .DefaultIfEmpty(0)
                             .Average();
 
@@ -121,7 +128,7 @@ namespace GestaoDefeitos.Application.PdfReport
                         var resolutionIndex = Math.Round((double)resolvedDefects.Count / (totalDefectsCount > 0 ? totalDefectsCount : 1) * 100, 2);
 
                         var invalidDefectsIndex = Math.Round(
-                            (decimal)defects.Count(d => d.Status.Equals(DefectStatus.Invalid.ToString()))
+                            (double)defects.Count(d => string.Equals(d.Status, DefectStatus.Invalid.ToString(), StringComparison.OrdinalIgnoreCase))
                             / (totalDefectsCount > 0 ? totalDefectsCount : 1)
                             * 100,
                             2);
@@ -131,7 +138,7 @@ namespace GestaoDefeitos.Application.PdfReport
                             container.Border(1)
                                      .BorderColor(Colors.Grey.Lighten1)
                                      .Padding(10)
-                                     .Background(Colors.Grey.Lighten5); // Fundo mais claro
+                                     .Background(Colors.Grey.Lighten5);
 
                         // Card de Defeitos por Status e Prioridade
                         stack.Item().Row(row =>
@@ -199,7 +206,6 @@ namespace GestaoDefeitos.Application.PdfReport
                             });
                         });
 
-
                         stack.Item().PaddingTop(20);
 
                         stack.Item().Text("Lista de Defeitos").Bold().FontSize(14).FontColor(MainColor).Underline().ParagraphSpacing(5);
@@ -226,7 +232,7 @@ namespace GestaoDefeitos.Application.PdfReport
                                     header.Cell().Element(HeaderStyle).AlignRight().Text("Prioridade").SemiBold();
 
                                     static QuestPDF.Infrastructure.IContainer HeaderStyle(QuestPDF.Infrastructure.IContainer container) =>
-                                        container.Background(MainColor) // Cor roxa para o cabeçalho
+                                        container.Background(MainColor)
                                                  .BorderBottom(1)
                                                  .BorderColor(MainColor)
                                                  .PaddingVertical(4)
@@ -236,7 +242,7 @@ namespace GestaoDefeitos.Application.PdfReport
                                 // Estilo das Células de Dados (linhas zebradas)
                                 QuestPDF.Infrastructure.IContainer DataCellStyle(QuestPDF.Infrastructure.IContainer container, int index)
                                 {
-                                    var backgroundColor = index % 2 == 0 ? Colors.White : Colors.Purple.Lighten5; // Linhas zebradas com roxo claro
+                                    var backgroundColor = index % 2 == 0 ? Colors.White : Colors.Purple.Lighten5;
 
                                     return container
                                         .Background(backgroundColor)
@@ -246,7 +252,6 @@ namespace GestaoDefeitos.Application.PdfReport
                                         .BorderColor(Colors.Grey.Lighten3);
                                 }
 
-
                                 int index = 1;
                                 foreach (var defect in defects)
                                 {
@@ -255,7 +260,7 @@ namespace GestaoDefeitos.Application.PdfReport
                                     var priorityPtBr = MapStringToPortuguese(defect.DefectPriority, typeof(DefectPriority));
 
                                     table.Cell().Element(c => DataCellStyle(c, index)).Text(index.ToString());
-                                    table.Cell().Element(c => DataCellStyle(c, index)).Text(defect.Summary);
+                                    table.Cell().Element(c => DataCellStyle(c, index)).Text(defect.Summary ?? string.Empty);
                                     table.Cell().Element(c => DataCellStyle(c, index)).Text(statusPtBr);
                                     table.Cell().Element(c => DataCellStyle(c, index)).AlignRight().Text(priorityPtBr);
 

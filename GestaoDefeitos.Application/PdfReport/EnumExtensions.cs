@@ -7,11 +7,20 @@ namespace GestaoDefeitos.Application.PdfReport
     {
         public static string GetDescription(this System.Enum value)
         {
-            FieldInfo field = value.GetType().GetField(value.ToString());
+            if (value is null)
+                return string.Empty;
 
-            DescriptionAttribute attribute = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute;
+            var type = value.GetType();
+            var name = System.Enum.GetName(type, value);
+            if (string.IsNullOrEmpty(name))
+                return value.ToString();
 
-            return attribute == null ? value.ToString() : attribute.Description;
+            var field = type.GetField(name, BindingFlags.Public | BindingFlags.Static);
+            if (field is null)
+                return name;
+
+            var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+            return attribute?.Description ?? name;
         }
 
         public static string GetPortugueseDescription(this System.Enum value)

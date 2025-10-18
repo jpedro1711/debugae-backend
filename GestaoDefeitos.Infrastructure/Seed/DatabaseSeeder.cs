@@ -394,7 +394,7 @@ public static class DatabaseSeeder
                                 _ => "ERP - Defeito com status"
                             },
                             status: st,
-                            category: categories[rng.Next(categories.Length)],
+                            category: DefectCategory.Functional,
                             cancellationToken);
                     }
                 }
@@ -473,10 +473,31 @@ public static class DatabaseSeeder
             await db.SaveChangesAsync(cancellationToken);
         }
 
+        // Helper: ensure some explicit count for status in a project
+        async Task EnsureSomeStatusAsync(Project project, DefectStatus status, int desired, string summaryPrefix)
+        {
+            var current = await db.Defects.CountAsync(d => d.ProjectId == project.Id && d.Status == status, cancellationToken);
+            for (int i = current; i < desired; i++)
+            {
+                await CreateCoverageDefect(project, mainUser, tester, dev2, rng,
+                    summary: $"{summaryPrefix} #{i + 1}",
+                    status: status,
+                    category: DefectCategory.Functional,
+                    cancellationToken);
+            }
+        }
+
         // Admin project: 20+ defects
         await EnsureDefectsForProjectAsync(erp, 20);
         // Contributor project: a few defects (3)
         await EnsureDefectsForProjectAsync(ponto, 3);
+
+        // Ensure explicit presence of NEW and RESOLVED in both projects
+        await EnsureSomeStatusAsync(erp, DefectStatus.New, 5, "ERP - Novo defeito");
+        await EnsureSomeStatusAsync(erp, DefectStatus.Resolved, 5, "ERP - Defeito resolvido");
+
+        await EnsureSomeStatusAsync(ponto, DefectStatus.New, 2, "Ponto - Novo defeito");
+        await EnsureSomeStatusAsync(ponto, DefectStatus.Resolved, 2, "Ponto - Defeito resolvido");
 
         // 6) Notifications (simple example)
         if (!await db.ContributorNotifications.AnyAsync(n => n.ContributorId == mainUser.Id, cancellationToken))
