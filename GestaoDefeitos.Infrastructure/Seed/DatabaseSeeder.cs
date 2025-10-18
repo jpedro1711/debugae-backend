@@ -78,10 +78,10 @@ public static class DatabaseSeeder
 
         // 3) Ensure Projects (normalize existing if needed)
         var erpName = "Sistema ERP Empresarial"; // already ASCII
-        var erpDescription = RemoveDiacritics("Plataforma integrada de gestão empresarial (vendas, estoque, financeiro)");
+        var erpDescription = RemoveDiacritics("Plataforma integrada de gestao empresarial (vendas, estoque, financeiro)");
 
         var pontoTargetName = RemoveDiacritics("Sistema de Ponto Eletrônico");
-        var pontoTargetDescription = RemoveDiacritics("Sistema de marcação de ponto eletrônico e apuração de jornada");
+        var pontoTargetDescription = RemoveDiacritics("Sistema de gerenciamento do ponto");
 
         // Load all projects once to compare ignoring diacritics
         var allProjects = await db.Projects.ToListAsync(cancellationToken);
