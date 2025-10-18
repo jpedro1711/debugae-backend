@@ -76,14 +76,18 @@ public static class DatabaseSeeder
         var tester = await EnsureContributorAsync("ana.tester@pucpr.br", "Ana", "Silva", ContributorProfession.Tester);
         var dev2 = await EnsureContributorAsync("carlos.dev@pucpr.br", "Carlos", "Souza", ContributorProfession.Developer);
 
-        // 3) Ensure Projects
-        var erpName = "Sistema ERP Empresarial";
+        // 3) Ensure Projects (normalize existing if needed)
+        var erpName = "Sistema ERP Empresarial"; // already ASCII
         var erpDescription = RemoveDiacritics("Plataforma integrada de gestão empresarial (vendas, estoque, financeiro)");
-        // Sanitize to ASCII to avoid environments that render Unicode incorrectly
-        var pontoName = RemoveDiacritics("Sistema de Ponto Eletrônico");
-        var pontoDescription = RemoveDiacritics("Sistema de marcação de ponto eletrônico e apuração de jornada");
 
-        var erp = await db.Projects.FirstOrDefaultAsync(p => p.Name == erpName, cancellationToken);
+        var pontoTargetName = RemoveDiacritics("Sistema de Ponto Eletrônico");
+        var pontoTargetDescription = RemoveDiacritics("Sistema de marcação de ponto eletrônico e apuração de jornada");
+
+        // Load all projects once to compare ignoring diacritics
+        var allProjects = await db.Projects.ToListAsync(cancellationToken);
+
+        // Try find ERP by diacritics-insensitive equality
+        var erp = allProjects.FirstOrDefault(p => string.Equals(RemoveDiacritics(p.Name), RemoveDiacritics(erpName), StringComparison.OrdinalIgnoreCase));
         if (erp is null)
         {
             erp = new Project
@@ -95,18 +99,40 @@ public static class DatabaseSeeder
             };
             db.Projects.Add(erp);
         }
+        else
+        {
+            // Normalize description if needed
+            if (!string.Equals(erp.Description, erpDescription, StringComparison.Ordinal))
+            {
+                erp.Description = erpDescription;
+                db.Projects.Update(erp);
+            }
+        }
 
-        var ponto = await db.Projects.FirstOrDefaultAsync(p => p.Name == pontoName, cancellationToken);
+        // Find Ponto by ignoring diacritics, even if previously seeded with corrupted encoding
+        var ponto = allProjects.FirstOrDefault(p => string.Equals(RemoveDiacritics(p.Name), pontoTargetName, StringComparison.OrdinalIgnoreCase)
+            || p.Name.Contains("Ponto", StringComparison.OrdinalIgnoreCase));
+
         if (ponto is null)
         {
             ponto = new Project
             {
                 Id = Guid.NewGuid(),
-                Name = pontoName,
-                Description = pontoDescription,
+                Name = pontoTargetName,
+                Description = pontoTargetDescription,
                 CreatedAt = DateTime.UtcNow.AddDays(-60)
             };
             db.Projects.Add(ponto);
+        }
+        else
+        {
+            // Force normalization to ASCII consistently
+            if (!string.Equals(ponto.Name, pontoTargetName, StringComparison.Ordinal) || !string.Equals(ponto.Description, pontoTargetDescription, StringComparison.Ordinal))
+            {
+                ponto.Name = pontoTargetName;
+                ponto.Description = pontoTargetDescription;
+                db.Projects.Update(ponto);
+            }
         }
 
         await db.SaveChangesAsync(cancellationToken);
