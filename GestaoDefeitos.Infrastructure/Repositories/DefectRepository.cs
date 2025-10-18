@@ -27,7 +27,10 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                         d.Tags.Select(t => t.Description).ToList(),
                         d.Version,
-                        d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                        d.DefectHistory
+                            .Where(e => e.NewValue == DefectStatus.Resolved.ToString())
+                            .Select(e => (DateTime?)e.CreatedAt)
+                            .FirstOrDefault(),
                         d.DefectSeverity.ToString()
                        ))
                 .ToListAsync(cancellationToken);
@@ -69,7 +72,10 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                         d.Tags.Select(t => t.Description).ToList(),
                         d.Version,
-                        d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                        d.DefectHistory
+                            .Where(e => e.NewValue == DefectStatus.Resolved.ToString())
+                            .Select(e => (DateTime?)e.CreatedAt)
+                            .FirstOrDefault(),
                         d.DefectSeverity.ToString()
                        ))
                 .ToListAsync(cancellationToken);
@@ -113,7 +119,10 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                     d.Tags.Select(t => t.Description).ToList(),
                     d.Version,
-                    d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                    d.DefectHistory
+                        .Where(e => e.NewValue == DefectStatus.Resolved.ToString())
+                        .Select(e => (DateTime?)e.CreatedAt)
+                        .FirstOrDefault(),
                     d.DefectSeverity.ToString()
                 ))
                 .ToListAsync(cancellationToken);
@@ -145,7 +154,10 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                     new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                     d.Tags.Select(t => t.Description).ToList(),
                     d.Version,
-                    d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                    d.DefectHistory
+                        .Where(e => e.NewValue == DefectStatus.Resolved.ToString())
+                        .Select(e => (DateTime?)e.CreatedAt)
+                        .FirstOrDefault(),
                         d.DefectSeverity.ToString()
                 ))
                 .ToListAsync(cancellationToken);
@@ -165,7 +177,10 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                         d.Description,
                         d.Summary,
                         d.CreatedAt,
-                        d.DefectHistory.Single(dh => dh.Action == DefectAction.Create).Contributor.FullName,
+                        d.DefectHistory
+                            .Where(dh => dh.Action == DefectAction.Create)
+                            .Select(dh => dh.Contributor.FullName)
+                            .FirstOrDefault(),
                         d.DefectSeverity.ToString(),
                         d.Status.ToString(),
                         d.ExpiresIn,
@@ -206,7 +221,10 @@ namespace GestaoDefeitos.Infrastructure.Repositories
                             new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
                             d.Tags.Select(t => t.Description).ToList(),
                             d.Version,
-                            d.DefectHistory.FirstOrDefault(e => e.NewValue == DefectStatus.Resolved.ToString()).CreatedAt,
+                            d.DefectHistory
+                                .Where(e => e.NewValue == DefectStatus.Resolved.ToString())
+                                .Select(e => (DateTime?)e.CreatedAt)
+                                .FirstOrDefault(),
                             d.DefectSeverity.ToString()
                         )),
                         null, // it will be populated in the handler

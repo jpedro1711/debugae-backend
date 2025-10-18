@@ -5,6 +5,8 @@ using GestaoDefeitos.Infrastructure.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
+using System.Text;
 
 namespace GestaoDefeitos.Infrastructure.Seed;
 
@@ -76,7 +78,9 @@ public static class DatabaseSeeder
 
         // 3) Ensure Projects
         var erpName = "Sistema ERP Empresarial";
-        var pontoName = "Sistema de Ponto Eletrônico";
+        // Sanitize to ASCII to avoid environments that render Unicode incorrectly
+        var pontoName = RemoveDiacritics("Sistema de Ponto Eletrônico");
+        var pontoDescription = RemoveDiacritics("Sistema de marcação de ponto eletrônico e apuração de jornada");
 
         var erp = await db.Projects.FirstOrDefaultAsync(p => p.Name == erpName, cancellationToken);
         if (erp is null)
@@ -98,7 +102,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 Name = pontoName,
-                Description = "Sistema de marcação de ponto eletrônico e apuração de jornada",
+                Description = pontoDescription,
                 CreatedAt = DateTime.UtcNow.AddDays(-60)
             };
             db.Projects.Add(ponto);
@@ -172,9 +176,9 @@ public static class DatabaseSeeder
 
             string[] pontoSummaries = new[]
             {
-                "Justificativa de falta não salva",
-                "Exportação de espelho de ponto em PDF quebra",
-                "Atraso no cálculo de horas extras"
+                RemoveDiacritics("Justificativa de falta não salva"),
+                RemoveDiacritics("Exportação de espelho de ponto em PDF quebra"),
+                RemoveDiacritics("Atraso no cálculo de horas extras")
             };
 
             var summaries = project.Name.Contains("ERP") ? erpSummaries : pontoSummaries;
@@ -512,5 +516,20 @@ public static class DatabaseSeeder
             });
             await db.SaveChangesAsync(cancellationToken);
         }
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+        var normalized = text.Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder();
+        foreach (var c in normalized)
+        {
+            var uc = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (uc != UnicodeCategory.NonSpacingMark)
+                sb.Append(c);
+        }
+        return sb.ToString().Normalize(NormalizationForm.FormC);
     }
 }
