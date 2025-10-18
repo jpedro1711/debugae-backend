@@ -78,6 +78,7 @@ public static class DatabaseSeeder
 
         // 3) Ensure Projects
         var erpName = "Sistema ERP Empresarial";
+        var erpDescription = RemoveDiacritics("Plataforma integrada de gestão empresarial (vendas, estoque, financeiro)");
         // Sanitize to ASCII to avoid environments that render Unicode incorrectly
         var pontoName = RemoveDiacritics("Sistema de Ponto Eletrônico");
         var pontoDescription = RemoveDiacritics("Sistema de marcação de ponto eletrônico e apuração de jornada");
@@ -89,7 +90,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 Name = erpName,
-                Description = "Plataforma integrada de gestão empresarial (vendas, estoque, financeiro)",
+                Description = erpDescription,
                 CreatedAt = DateTime.UtcNow.AddDays(-120)
             };
             db.Projects.Add(erp);
@@ -150,7 +151,7 @@ public static class DatabaseSeeder
             var priorities = new[] { DefectPriority.P1, DefectPriority.P2, DefectPriority.P3, DefectPriority.P4, DefectPriority.P5 };
             var environments = new[] { DefectEnvironment.Development, DefectEnvironment.Staging, DefectEnvironment.Production };
 
-            string[] erpSummaries = new[]
+            string[] erpSummariesRaw = new[]
             {
                 "Erro ao calcular impostos na nota fiscal",
                 "Lentidão no relatório de vendas mensais",
@@ -173,6 +174,7 @@ public static class DatabaseSeeder
                 "API de produtos devolve 404 para SKU válido",
                 "Atualização de versão trava em 75%"
             };
+            var erpSummaries = erpSummariesRaw.Select(RemoveDiacritics).ToArray();
 
             string[] pontoSummaries = new[]
             {
@@ -199,21 +201,24 @@ public static class DatabaseSeeder
 
                 var assignee = (i % 2 == 0) ? mainUser : (i % 3 == 0 ? tester : dev2);
 
+                var summaryText = summaries[i];
+                var descriptionText = RemoveDiacritics($"{summaryText} - Passos para reproduzir: ...");
+
                 var defect = new Defect
                 {
                     Id = Guid.NewGuid(),
                     ProjectId = project.Id,
                     AssignedToContributorId = assignee.Id,
-                    Summary = summaries[i],
-                    Description = $"{summaries[i]} – Passos para reproduzir: ...",
+                    Summary = summaryText,
+                    Description = descriptionText,
                     DefectCategory = category,
                     DefectSeverity = severity,
                     DefectEnvironment = env,
                     DefectPriority = priority,
                     Version = project.Name.Contains("ERP") ? $"v1.{i % 4}.{rng.Next(0, 9)}" : $"v2.{i % 2}.{rng.Next(0, 9)}",
-                    ExpectedBehaviour = "Processo deve executar conforme especificações",
+                    ExpectedBehaviour = RemoveDiacritics("Processo deve executar conforme especificações"),
                     ActualBehaviour = "Comportamento divergente observado",
-                    ErrorLog = i % 4 == 0 ? "System.TimeoutException: operação excedeu o tempo limite" : string.Empty,
+                    ErrorLog = i % 4 == 0 ? RemoveDiacritics("System.TimeoutException: operação excedeu o tempo limite") : string.Empty,
                     ExpiresIn = expiresIn,
                     Status = status,
                     CreatedAt = createdAt,
@@ -237,7 +242,7 @@ public static class DatabaseSeeder
                 {
                     Id = Guid.NewGuid(),
                     ContributorId = tester.Id,
-                    Content = "Comentário inicial: validado cenário e reproduzido",
+                    Content = RemoveDiacritics("Comentário inicial: validado cenário e reproduzido"),
                     CreatedAt = createdAt.AddHours(2)
                 });
                 if (i % 3 == 0)
@@ -246,7 +251,7 @@ public static class DatabaseSeeder
                     {
                         Id = Guid.NewGuid(),
                         ContributorId = dev2.Id,
-                        Content = "Em análise pela equipe de desenvolvimento",
+                        Content = RemoveDiacritics("Em análise pela equipe de desenvolvimento"),
                         CreatedAt = createdAt.AddHours(5)
                     });
                 }
@@ -260,7 +265,7 @@ public static class DatabaseSeeder
                         FileName = $"evidencia_{i}.txt",
                         FileType = "text/plain",
                         UploadByUsername = assignee.FullName,
-                        FileContent = System.Text.Encoding.UTF8.GetBytes("Evidência do erro..."),
+                        FileContent = System.Text.Encoding.UTF8.GetBytes(RemoveDiacritics("Evidência do erro...")),
                         CreatedAt = createdAt.AddHours(3)
                     };
                 }
@@ -323,7 +328,7 @@ public static class DatabaseSeeder
                     defect.TrelloUserStories.Add(new TrelloUserStory
                     {
                         Id = Guid.NewGuid(),
-                        Name = $"US-{1000 + i} - {summaries[i]}",
+                        Name = $"US-{1000 + i} - {summaryText}",
                         Desc = "User story relacionada ao defeito",
                         ShortUrl = "https://trello.com/c/abcd1234"
                     });
@@ -368,9 +373,9 @@ public static class DatabaseSeeder
                         await CreateCoverageDefect(project, mainUser, tester, dev2, rng,
                             summary: cat switch
                             {
-                                DefectCategory.Functional => "ERP - Regra de negócio não aplicada no faturamento",
+                                DefectCategory.Functional => "ERP - Regra de negocio nao aplicada no faturamento",
                                 DefectCategory.Interface => "ERP - Quebra de layout na tela de pedidos",
-                                DefectCategory.Performance => "ERP - Lentidão ao processar fechamento do mês",
+                                DefectCategory.Performance => "ERP - Lentidao ao processar fechamento do mes",
                                 DefectCategory.Improvement => "ERP - Melhorar usabilidade no cadastro de clientes",
                                 _ => "ERP - Defeito categorizado"
                             },
@@ -389,12 +394,12 @@ public static class DatabaseSeeder
                         await CreateCoverageDefect(project, mainUser, tester, dev2, rng,
                             summary: st switch
                             {
-                                DefectStatus.New => "ERP - Novo defeito reportado no módulo fiscal",
-                                DefectStatus.InProgress => "ERP - Correção em andamento no módulo de estoque",
-                                DefectStatus.WaitingForUser => "ERP - Aguardando usuário anexar evidências",
-                                DefectStatus.Resolved => "ERP - Problema de comissão resolvido",
-                                DefectStatus.Invalid => "ERP - Registro marcado como inválido",
-                                DefectStatus.Reopened => "ERP - Defeito reaberto após regressão",
+                                DefectStatus.New => "ERP - Novo defeito reportado no modulo fiscal",
+                                DefectStatus.InProgress => "ERP - Correcao em andamento no modulo de estoque",
+                                DefectStatus.WaitingForUser => "ERP - Aguardando usuario anexar evidencias",
+                                DefectStatus.Resolved => "ERP - Problema de comissao resolvido",
+                                DefectStatus.Invalid => "ERP - Registro marcado como invalido",
+                                DefectStatus.Reopened => "ERP - Defeito reaberto apos regressao",
                                 _ => "ERP - Defeito com status"
                             },
                             status: st,
@@ -423,21 +428,24 @@ public static class DatabaseSeeder
             var expiresIn = createdAt.AddDays(rng.Next(7, 45));
             var assignee = (rng.Next(0, 2) == 0) ? mainUser : dev2;
 
+            var summaryText = RemoveDiacritics(summary);
+            var descriptionText = RemoveDiacritics($"{summaryText} - Passos para reproduzir: ...");
+
             var defect = new Defect
             {
                 Id = Guid.NewGuid(),
                 ProjectId = project.Id,
                 AssignedToContributorId = assignee.Id,
-                Summary = summary,
-                Description = $"{summary} – Passos para reproduzir: ...",
+                Summary = summaryText,
+                Description = descriptionText,
                 DefectCategory = category,
                 DefectSeverity = Enum.GetValues<DefectSeverity>()[rng.Next(0, Enum.GetValues<DefectSeverity>().Length)],
                 DefectEnvironment = Enum.GetValues<DefectEnvironment>()[rng.Next(0, Enum.GetValues<DefectEnvironment>().Length)],
                 DefectPriority = Enum.GetValues<DefectPriority>()[rng.Next(0, Enum.GetValues<DefectPriority>().Length)],
                 Version = project.Name.Contains("ERP") ? $"v1.{rng.Next(0, 4)}.{rng.Next(0, 9)}" : $"v2.{rng.Next(0, 2)}.{rng.Next(0, 9)}",
-                ExpectedBehaviour = "Processo deve executar conforme especificações",
+                ExpectedBehaviour = RemoveDiacritics("Processo deve executar conforme especificações"),
                 ActualBehaviour = "Comportamento divergente observado",
-                ErrorLog = rng.Next(0, 3) == 0 ? "System.NullReferenceException em GestaoDefeitos.Core" : string.Empty,
+                ErrorLog = rng.Next(0, 3) == 0 ? RemoveDiacritics("System.NullReferenceException em GestaoDefeitos.Core") : string.Empty,
                 ExpiresIn = expiresIn,
                 Status = status,
                 CreatedAt = createdAt,
@@ -449,7 +457,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 ContributorId = tester.Id,
-                Content = "Defeito criado para cobrir categoria/status ausente",
+                Content = RemoveDiacritics("Defeito criado para cobrir categoria/status ausente"),
                 CreatedAt = createdAt.AddHours(1)
             });
 
@@ -484,7 +492,7 @@ public static class DatabaseSeeder
             for (int i = current; i < desired; i++)
             {
                 await CreateCoverageDefect(project, mainUser, tester, dev2, rng,
-                    summary: $"{summaryPrefix} #{i + 1}",
+                    summary: RemoveDiacritics($"{summaryPrefix} #{i + 1}"),
                     status: status,
                     category: DefectCategory.Functional,
                     cancellationToken);
@@ -510,7 +518,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 ContributorId = mainUser.Id,
-                Content = "Bem-vindo! Seus projetos foram inicializados com dados de exemplo.",
+                Content = RemoveDiacritics("Bem-vindo! Seus projetos foram inicializados com dados de exemplo."),
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow
             });
