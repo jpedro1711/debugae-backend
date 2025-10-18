@@ -80,7 +80,7 @@ public static class DatabaseSeeder
         var erpName = "Sistema ERP Empresarial"; // already ASCII
         var erpDescription = RemoveDiacritics("Plataforma integrada de gestao empresarial (vendas, estoque, financeiro)");
 
-        var pontoTargetName = RemoveDiacritics("Sistema de Ponto Eletrônico");
+        var pontoTargetName = RemoveDiacritics("Sistema de Ponto Eletronico");
         var pontoTargetDescription = RemoveDiacritics("Sistema de gerenciamento do ponto");
 
         // Load all projects once to compare ignoring diacritics
