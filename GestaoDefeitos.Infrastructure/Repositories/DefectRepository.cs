@@ -167,78 +167,90 @@ namespace GestaoDefeitos.Infrastructure.Repositories
 
         public async Task<DefectFullDetailsViewModel> GetDefectDetails(Guid defectId, Guid currentLoggedUserId, CancellationToken cancellationToken)
         {
-            return await _context
-                    .Defects
-                    .AsNoTracking()
-                    .AsSplitQuery()
-                    .Where(defect => defect.Id == defectId)
-                    .Select(d => new DefectFullDetailsViewModel(
-                        d.Id,
-                        d.Description,
-                        d.Summary,
-                        d.CreatedAt,
-                        d.DefectHistory
-                            .Where(dh => dh.Action == DefectAction.Create)
-                            .Select(dh => dh.Contributor.FullName)
-                            .FirstOrDefault(),
-                        d.DefectSeverity.ToString(),
-                        d.Status.ToString(),
-                        d.ExpiresIn,
-                        d.DefectCategory.ToString(),
-                        new DefectResponsibleContributorViewModel(
-                            d.AssignedToContributor.Id,
-                            d.AssignedToContributor.FullName,
-                            d.AssignedToContributor.Email!
-                        ),
-                        new DefectDetailsViewModel(
-                            d.Description,
-                            d.DefectEnvironment.ToString(),
-                            d.ActualBehaviour,
-                            d.ExpectedBehaviour,
-                            d.Project.Name,
-                            d.AssignedToContributor.FullName
-                        ),
-                        d.Comments.Select(c => new DefectCommentViewModel(
-                            c.Contributor.FullName,
-                            c.Content,
-                            c.CreatedAt
-                        )),
-                        d.Attachment != null ? new DefectAttachmentViewModel(
-                            d.Attachment.FileName,
-                            d.Attachment.FileType,
-                            d.Attachment.CreatedAt,
-                            d.Attachment.UploadByUsername
-                        ) : null,
-                        d.RelatedDefects.Select(rd => new DefectsSimplifiedViewModel(
-                            rd.RelatedDefect.Id,
-                            rd.RelatedDefect.Description,
-                            rd.RelatedDefect.Summary,
-                            rd.RelatedDefect.Status.ToString(),
-                            rd.RelatedDefect.DefectPriority.ToString(),
-                            d.ExpiresIn,
-                            rd.RelatedDefect.CreatedAt,
-                            rd.RelatedDefect.DefectCategory.ToString(),
-                            new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
-                            d.Tags.Select(t => t.Description).ToList(),
-                            d.Version,
-                            d.DefectHistory
-                                .Where(e => e.NewValue == DefectStatus.Resolved.ToString())
-                                .Select(e => (DateTime?)e.CreatedAt)
-                                .FirstOrDefault(),
-                            d.DefectSeverity.ToString()
-                        )),
-                        null, // it will be populated in the handler
-                        d.TrelloUserStories.Select(ts => new TrelloUserStoryViewModel(
-                            ts.Desc,
-                            ts.ShortUrl,
-                            ts.Name,
-                            ts.DefectId
-                        )),
-                        d.ErrorLog,
-                        d.Tags.Select(t => t.Description),
-                        d.ProjectId,
-                        d.ContributorMailLetter.Any(c => c.ContributorId == currentLoggedUserId)
-                    )).SingleAsync(cancellationToken);
+            var d = await _context.Defects
+                .AsNoTracking()
+                .Where(x => x.Id == defectId)
+                .Include(x => x.AssignedToContributor)
+                .Include(x => x.Project)
+                .Include(x => x.Comments).ThenInclude(c => c.Contributor)
+                .Include(x => x.Attachment)
+                .Include(x => x.RelatedDefects).ThenInclude(r => r.RelatedDefect)
+                .Include(x => x.TrelloUserStories)
+                .Include(x => x.Tags)
+                .Include(x => x.DefectHistory).ThenInclude(h => h.Contributor)
+                .SingleAsync(cancellationToken);
+
+            var createdBy = d.DefectHistory
+                .FirstOrDefault(h => h.Action == DefectAction.Create)?.Contributor?.FullName;
+
+            var related = d.RelatedDefects.Select(rd => new DefectsSimplifiedViewModel(
+                rd.RelatedDefect.Id,
+                rd.RelatedDefect.Description,
+                rd.RelatedDefect.Summary,
+                rd.RelatedDefect.Status.ToString(),
+                rd.RelatedDefect.DefectPriority.ToString(),
+                d.ExpiresIn,
+                rd.RelatedDefect.CreatedAt,
+                rd.RelatedDefect.DefectCategory.ToString(),
+                new ProjectSimplifiedViewModel(d.Project.Id, d.Project.Name, d.Project.Description, d.Project.CreatedAt),
+                d.Tags.Select(t => t.Description).ToList(),
+                d.Version,
+                d.DefectHistory
+                    .Where(e => e.NewValue == DefectStatus.Resolved.ToString())
+                    .Select(e => (DateTime?)e.CreatedAt)
+                    .FirstOrDefault(),
+                d.DefectSeverity.ToString()
+            ));
+
+            var trello = d.TrelloUserStories.Select(ts => new TrelloUserStoryViewModel(
+                ts.Desc,
+                ts.ShortUrl,
+                ts.Name,
+                ts.DefectId
+            ));
+
+            return new DefectFullDetailsViewModel(
+                d.Id,
+                d.Description,
+                d.Summary,
+                d.CreatedAt,
+                createdBy,
+                d.DefectSeverity.ToString(),
+                d.Status.ToString(),
+                d.ExpiresIn,
+                d.DefectCategory.ToString(),
+                new DefectResponsibleContributorViewModel(
+                    d.AssignedToContributor.Id,
+                    d.AssignedToContributor.FullName,
+                    d.AssignedToContributor.Email!
+                ),
+                new DefectDetailsViewModel(
+                    d.Description,
+                    d.DefectEnvironment.ToString(),
+                    d.ActualBehaviour,
+                    d.ExpectedBehaviour,
+                    d.Project.Name,
+                    d.AssignedToContributor.FullName
+                ),
+                d.Comments.Select(c => new DefectCommentViewModel(
+                    c.Contributor.FullName,
+                    c.Content,
+                    c.CreatedAt
+                )),
+                d.Attachment != null ? new DefectAttachmentViewModel(
+                    d.Attachment.FileName,
+                    d.Attachment.FileType,
+                    d.Attachment.CreatedAt,
+                    d.Attachment.UploadByUsername
+                ) : null,
+                related,
+                null,
+                trello,
+                d.ErrorLog,
+                d.Tags.Select(t => t.Description),
+                d.ProjectId,
+                d.ContributorMailLetter.Any(c => c.ContributorId == currentLoggedUserId)
+            );
         }
 
     }
