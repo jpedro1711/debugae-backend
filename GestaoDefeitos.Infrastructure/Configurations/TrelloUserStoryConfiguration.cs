@@ -12,6 +12,11 @@ namespace GestaoDefeitos.Infrastructure.Configurations
                 .HasOne(dr => dr.Defect)
                 .WithMany(d => d.TrelloUserStories)
                 .OnDelete(DeleteBehavior.ClientCascade);
+
+            // Ensure Unicode for text fields
+            builder.Property(t => t.Name).IsUnicode(true);
+            builder.Property(t => t.Desc).IsUnicode(true);
+            builder.Property(t => t.ShortUrl).IsUnicode(true);
         }
     }
 }

@@ -4,6 +4,7 @@ using GestaoDefeitos.Domain.Identity;
 using GestaoDefeitos.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace GestaoDefeitos.Infrastructure.Database
 {
@@ -46,6 +47,12 @@ namespace GestaoDefeitos.Infrastructure.Database
             builder.ApplyConfiguration(new DefectAttachmentConfiguration());
             builder.ApplyConfiguration(new DefectConfiguration());
             builder.ApplyConfiguration(new DefectMailLetterConfiguration());
+            builder.ApplyConfiguration(new ProjectConfiguration());
+            builder.ApplyConfiguration(new TagConfiguration());
+            builder.ApplyConfiguration(new DefectAttachmentExtraConfiguration());
+            builder.ApplyConfiguration(new DefectCommentExtraConfiguration());
+            builder.ApplyConfiguration(new DefectChangeEventExtraConfiguration());
+            builder.ApplyConfiguration(new TrelloUserStoryConfiguration());
         }
     }
 }
