@@ -1,4 +1,5 @@
 ﻿using GestaoDefeitos.Infrastructure.Database;
+using GestaoDefeitos.Infrastructure.Seed;
 using Microsoft.EntityFrameworkCore;
 
 namespace GestaoDefeitos.WebApi.Extensions.Migrations
@@ -10,6 +11,9 @@ namespace GestaoDefeitos.WebApi.Extensions.Migrations
             using var scope = app.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Database.Migrate();
+
+            // Run seed (fire-and-forget acceptable at startup, but await synchronously to ensure data exists)
+            DatabaseSeeder.SeedAsync(app.Services).GetAwaiter().GetResult();
         }
     }
 }
