@@ -55,7 +55,7 @@ namespace GestaoDefeitos.Application.PdfReport
                                 col.Item().Text("Debugaê").Bold().FontSize(22).FontColor(Colors.White);
                                 col.Item().Text("Relatório de Defeitos").FontSize(12).FontColor(Colors.Grey.Lighten3);
                             });
-                            row.ConstantItem(1).PaddingHorizontal(5);
+                            // spacer removed to avoid conflicting padding on fixed width container
                             row.RelativeItem().AlignRight().Column(col =>
                             {
                                 col.Item().Text(text =>
@@ -289,7 +289,7 @@ namespace GestaoDefeitos.Application.PdfReport
                         {
                             card.Item().Row(r =>
                             {
-                                r.ConstantItem(4).Height(14).Background(MainColor);
+                                r.ConstantItem(4).Background(MainColor); // width-only accent bar that matches row height
                                 r.RelativeItem().PaddingLeft(6).AlignMiddle().Text(title).Bold().FontSize(12).FontColor(MainColor);
                             });
                             card.Item().PaddingBottom(4);
