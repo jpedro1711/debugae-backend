@@ -45,49 +45,44 @@ namespace GestaoDefeitos.Application.PdfReport
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Helvetica"));
 
-                    // --- Header ---
-                    page.Header().Row(row =>
+                    // Header banner
+                    page.Header().Element(header =>
                     {
-                        row.RelativeItem().Column(stack =>
+                        header.Background(MainColor).Padding(14).Row(row =>
                         {
-                            stack.Item().Text("Debugaê")
-                                .Bold()
-                                .FontSize(24)
-                                .FontColor(MainColor);
-
-                            stack.Item().Text("Relatório de Defeitos")
-                                .FontSize(14)
-                                .FontColor(Colors.Grey.Darken2);
-
-                            stack.Item().PaddingTop(5).Text(text =>
+                            row.RelativeItem().Column(col =>
                             {
-                                text.Span("Emitido em: ").SemiBold().FontSize(10);
-                                text.Span(emissionDate).FontSize(10);
+                                col.Item().Text("Debugaê").Bold().FontSize(22).FontColor(Colors.White);
+                                col.Item().Text("Relatório de Defeitos").FontSize(12).FontColor(Colors.Grey.Lighten3);
                             });
-
-                            if (!string.IsNullOrWhiteSpace(projectName))
+                            row.ConstantItem(1).PaddingHorizontal(5);
+                            row.RelativeItem().AlignRight().Column(col =>
                             {
-                                stack.Item().Text(text =>
+                                col.Item().Text(text =>
                                 {
-                                    text.Span("Projeto: ").SemiBold().FontSize(10);
-                                    text.Span(projectName).FontSize(10);
+                                    text.Span("Emitido em: ").SemiBold().FontColor(Colors.White);
+                                    text.Span(emissionDate).FontColor(Colors.White);
                                 });
-                            }
-
-                            stack.Item().Text(text =>
-                            {
-                                text.Span("Usuário: ").SemiBold().FontSize(10);
-                                text.Span(userName).FontSize(10);
                             });
                         });
-
-                        row.ConstantItem(50);
                     });
 
-                    // --- Content ---
                     page.Content().PaddingVertical(1, Unit.Centimetre).Column(stack =>
                     {
-                        // Cálculos das Métricas e Mapeamento para PT-BR
+                        // Chips for context (Project / User)
+                        stack.Item().Row(row =>
+                        {
+                            if (!string.IsNullOrWhiteSpace(projectName))
+                            {
+                                row.AutoItem().Element(Chip).Text($"Projeto: {projectName}");
+                                row.ConstantItem(8);
+                            }
+                            row.AutoItem().Element(Chip).Text($"Usuário: {userName}");
+                        });
+
+                        stack.Item().PaddingVertical(10);
+
+                        // Metrics and group calculations
                         var statusGroups = defects
                             .GroupBy(d => MapStringToPortuguese(d.Status, typeof(DefectStatus)))
                             .OrderBy(g => g.Key)
@@ -103,7 +98,6 @@ namespace GestaoDefeitos.Application.PdfReport
                             .OrderBy(g => g.Key)
                             .ToDictionary(g => g.Key, g => g.Count());
 
-                        // Variável defectByVersion adicionada ao relatório
                         var versionGroups = defects
                             .GroupBy(d => string.IsNullOrWhiteSpace(d.Version) ? "Sem versão" : d.Version)
                             .OrderBy(g => g.Key)
@@ -133,28 +127,51 @@ namespace GestaoDefeitos.Application.PdfReport
                             * 100,
                             2);
 
-                        // Estilo de Card Aprimorado
-                        static QuestPDF.Infrastructure.IContainer CardStyle(QuestPDF.Infrastructure.IContainer container) =>
-                            container.Border(1)
-                                     .BorderColor(Colors.Grey.Lighten1)
-                                     .Padding(10)
-                                     .Background(Colors.Grey.Lighten5);
-
-                        // Card de Defeitos por Status e Prioridade
+                        // KPI summary cards
                         stack.Item().Row(row =>
                         {
-                            row.RelativeItem().Element(CardStyle).Column(card =>
+                            row.RelativeItem().Element(SummaryCard).Column(card =>
                             {
-                                card.Item().Text("Defeitos por Status").Bold().FontSize(12).FontColor(MainColor).Underline();
+                                card.Item().Text("Total de Defeitos").FontColor(Colors.Grey.Darken2);
+                                card.Item().Text(totalDefectsCount.ToString()).Bold().FontSize(20).FontColor(MainColor);
+                            });
+                            row.ConstantItem(10);
+                            row.RelativeItem().Element(SummaryCard).Column(card =>
+                            {
+                                card.Item().Text("Tempo Médio de Resolução (dias)").FontColor(Colors.Grey.Darken2);
+                                card.Item().Text($"{mediumResolutionTimeInDays:F2}").Bold().FontSize(20).FontColor(MainColor);
+                            });
+                            row.ConstantItem(10);
+                            row.RelativeItem().Element(SummaryCard).Column(card =>
+                            {
+                                card.Item().Text("Índice de Resolução").FontColor(Colors.Grey.Darken2);
+                                card.Item().Text($"{resolutionIndex}%").Bold().FontSize(20).FontColor(MainColor);
+                            });
+                            row.ConstantItem(10);
+                            row.RelativeItem().Element(SummaryCard).Column(card =>
+                            {
+                                card.Item().Text("Índice de Inválidos").FontColor(Colors.Grey.Darken2);
+                                card.Item().Text($"{invalidDefectsIndex}%").Bold().FontSize(20).FontColor(MainColor);
+                            });
+                        });
+
+                        stack.Item().PaddingVertical(12);
+
+                        // Distribution cards: Status / Prioridade
+                        stack.Item().Row(row =>
+                        {
+                            row.RelativeItem().Element(Card).Column(card =>
+                            {
+                                CardHeader(card, "Defeitos por Status");
                                 foreach (var item in statusGroups)
                                     card.Item().Text($"{item.Key}: {item.Value}");
                             });
 
                             row.ConstantItem(10);
 
-                            row.RelativeItem().Element(CardStyle).Column(card =>
+                            row.RelativeItem().Element(Card).Column(card =>
                             {
-                                card.Item().Text("Defeitos por Prioridade").Bold().FontSize(12).FontColor(MainColor).Underline();
+                                CardHeader(card, "Defeitos por Prioridade");
                                 foreach (var item in priorityGroups)
                                     card.Item().Text($"{item.Key}: {item.Value}");
                             });
@@ -162,55 +179,56 @@ namespace GestaoDefeitos.Application.PdfReport
 
                         stack.Item().PaddingVertical(10);
 
-                        // Card de Métricas Chave e Categoria
+                        // Distribution cards: Categoria / Severidade
                         stack.Item().Row(row =>
                         {
-                            row.RelativeItem().Element(CardStyle).Column(card =>
+                            row.RelativeItem().Element(Card).Column(card =>
                             {
-                                card.Item().Text("Métricas Chave").Bold().FontSize(12).FontColor(MainColor).Underline();
-                                card.Item().Text($"Total de Defeitos: {totalDefectsCount}");
-                                card.Item().Text($"Tempo Médio de Resolução: {mediumResolutionTimeInDays:F2} dias");
-                                card.Item().Text($"Índice de Resolução: {resolutionIndex}%");
-                                card.Item().Text($"Índice de defeitos Inválidos: {invalidDefectsIndex}%");
+                                CardHeader(card, "Defeitos por Categoria");
+                                foreach (var item in categoryGroups)
+                                    card.Item().Text($"{item.Key}: {item.Value}");
                             });
 
                             row.ConstantItem(10);
 
-                            // Card por Categoria
-                            row.RelativeItem().Element(CardStyle).Column(card =>
+                            row.RelativeItem().Element(Card).Column(card =>
                             {
-                                card.Item().Text("Defeitos por Categoria").Bold().FontSize(12).FontColor(MainColor).Underline();
-                                foreach (var item in categoryGroups)
+                                CardHeader(card, "Defeitos por Severidade");
+                                foreach (var item in severityGroups)
                                     card.Item().Text($"{item.Key}: {item.Value}");
                             });
                         });
 
                         stack.Item().PaddingVertical(10);
 
-                        // NOVO: Card de Defeitos por Severidade e Versão
-                        stack.Item().Row(row =>
+                        // Versions
+                        stack.Item().Element(Card).Column(card =>
                         {
-                            row.RelativeItem().Element(CardStyle).Column(card =>
+                            CardHeader(card, "Defeitos por Versão");
+                            // Display versions in two columns for better readability
+                            card.Item().Row(row =>
                             {
-                                card.Item().Text("Defeitos por Severidade").Bold().FontSize(12).FontColor(MainColor).Underline();
-                                foreach (var item in severityGroups)
-                                    card.Item().Text($"{item.Key}: {item.Value}");
-                            });
+                                var half = (int)Math.Ceiling(versionGroups.Count / 2.0);
+                                var left = versionGroups.Take(half);
+                                var right = versionGroups.Skip(half);
 
-                            // Card por Versão
-                            row.RelativeItem().Element(CardStyle).Column(card =>
-                            {
-                                card.Item().Text("Defeitos por Versão").Bold().FontSize(12).FontColor(MainColor).Underline();
-                                foreach (var item in versionGroups)
-                                    card.Item().Text($"{item.Key}: {item.Value}");
+                                row.RelativeItem().Column(col =>
+                                {
+                                    foreach (var v in left)
+                                        col.Item().Text($"{v.Key}: {v.Value}");
+                                });
+                                row.RelativeItem().Column(col =>
+                                {
+                                    foreach (var v in right)
+                                        col.Item().Text($"{v.Key}: {v.Value}");
+                                });
                             });
                         });
 
-                        stack.Item().PaddingTop(20);
-
+                        stack.Item().PaddingTop(16);
                         stack.Item().Text("Lista de Defeitos").Bold().FontSize(14).FontColor(MainColor).Underline().ParagraphSpacing(5);
 
-                        // --- Tabela de Defeitos ---
+                        // Table
                         stack.Item().Element(container =>
                         {
                             container.Table(table =>
@@ -223,31 +241,29 @@ namespace GestaoDefeitos.Application.PdfReport
                                     columns.RelativeColumn(2);
                                 });
 
-                                // Estilo do Cabeçalho da Tabela
                                 table.Header(header =>
                                 {
-                                    header.Cell().Element(HeaderStyle).Text("#").SemiBold();
-                                    header.Cell().Element(HeaderStyle).Text("Sumário").SemiBold();
-                                    header.Cell().Element(HeaderStyle).Text("Status").SemiBold();
-                                    header.Cell().Element(HeaderStyle).AlignRight().Text("Prioridade").SemiBold();
+                                    header.Cell().Element(HeaderStyle).Text("#").SemiBold().FontColor(Colors.White);
+                                    header.Cell().Element(HeaderStyle).Text("Sumário").SemiBold().FontColor(Colors.White);
+                                    header.Cell().Element(HeaderStyle).Text("Status").SemiBold().FontColor(Colors.White);
+                                    header.Cell().Element(HeaderStyle).AlignRight().Text("Prioridade").SemiBold().FontColor(Colors.White);
 
-                                    static QuestPDF.Infrastructure.IContainer HeaderStyle(QuestPDF.Infrastructure.IContainer container) =>
+                                    static IContainer HeaderStyle(IContainer container) =>
                                         container.Background(MainColor)
                                                  .BorderBottom(1)
                                                  .BorderColor(MainColor)
-                                                 .PaddingVertical(4)
-                                                 .PaddingHorizontal(5);
+                                                 .PaddingVertical(6)
+                                                 .PaddingHorizontal(6);
                                 });
 
-                                // Estilo das Células de Dados (linhas zebradas)
-                                QuestPDF.Infrastructure.IContainer DataCellStyle(QuestPDF.Infrastructure.IContainer container, int index)
+                                static IContainer DataCellStyle(IContainer container, int index)
                                 {
                                     var backgroundColor = index % 2 == 0 ? Colors.White : Colors.Purple.Lighten5;
 
                                     return container
                                         .Background(backgroundColor)
                                         .PaddingVertical(5)
-                                        .PaddingHorizontal(5)
+                                        .PaddingHorizontal(6)
                                         .BorderBottom(1)
                                         .BorderColor(Colors.Grey.Lighten3);
                                 }
@@ -255,7 +271,6 @@ namespace GestaoDefeitos.Application.PdfReport
                                 int index = 1;
                                 foreach (var defect in defects)
                                 {
-                                    // Mapeamento em PT-BR na lista de defeitos
                                     var statusPtBr = MapStringToPortuguese(defect.Status, typeof(DefectStatus));
                                     var priorityPtBr = MapStringToPortuguese(defect.DefectPriority, typeof(DefectPriority));
 
@@ -268,9 +283,38 @@ namespace GestaoDefeitos.Application.PdfReport
                                 }
                             });
                         });
+
+                        // Local UI helpers
+                        static void CardHeader(ColumnDescriptor card, string title)
+                        {
+                            card.Item().Row(r =>
+                            {
+                                r.ConstantItem(4).Height(14).Background(MainColor);
+                                r.RelativeItem().PaddingLeft(6).AlignMiddle().Text(title).Bold().FontSize(12).FontColor(MainColor);
+                            });
+                            card.Item().PaddingBottom(4);
+                        }
+
+                        static IContainer Card(IContainer container) =>
+                            container.Border(1)
+                                     .BorderColor(Colors.Grey.Lighten1)
+                                     .Padding(10)
+                                     .Background(Colors.White);
+
+                        static IContainer SummaryCard(IContainer container) =>
+                            container.Border(1)
+                                     .BorderColor(Colors.Grey.Lighten1)
+                                     .Padding(12)
+                                     .Background(Colors.Purple.Lighten5);
+
+                        static IContainer Chip(IContainer container) =>
+                            container.Background(Colors.Purple.Lighten5)
+                                     .PaddingVertical(4)
+                                     .PaddingHorizontal(8)
+                                     .Border(1)
+                                     .BorderColor(Colors.Purple.Lighten3);
                     });
 
-                    // --- Footer ---
                     page.Footer()
                         .AlignCenter()
                         .Text(x =>
