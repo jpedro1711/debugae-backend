@@ -137,15 +137,18 @@ namespace GestaoDefeitos.WebApi.Extensions.ApplicationBuilder
 
         public static WebApplication ConfigureWebApplication(this WebApplication webApplication)
         {
-            webApplication.UseSwagger();
-            webApplication.UseSwaggerUI();
+            if (webApplication.Environment.IsDevelopment())
+            {
+                webApplication.UseDeveloperExceptionPage();
+                webApplication.UseSwagger();
+                webApplication.UseSwaggerUI();
+            }
 
             webApplication.ApplyMigrations();
 
             webApplication.UseHttpsRedirection();
 
             webApplication.UseCors("AllowAll");
-
 
             webApplication.UseAuthentication();
             webApplication.UseAuthorization();
