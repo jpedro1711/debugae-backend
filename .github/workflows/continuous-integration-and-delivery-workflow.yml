@@ -5,6 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run composite greeting action
-        uses: jpedro1711/github-actions-course/.github/actions/composite-cache-deps@main
+        uses: jpedro1711/github-actions-course/.github/actions/composite-cache-deps@v1.0
         with:
           who-to-greet: 'Alice'
