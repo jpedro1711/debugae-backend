@@ -8,6 +8,6 @@ jobs:
       - uses: actions/checkout@v6
 
       - id: test_composite_action
-        uses: jpedro1711/github-actions-course/composite-cache-deps@v1.0
+        uses: jpedro1711/github-actions-course/.github/actions/composite-cache-deps@v1.0
         with:
           who-to-greet: 'TEST 2'
